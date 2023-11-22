@@ -8,7 +8,7 @@ import (
 )
 
 func Server(router *gin.Engine) *http.Server{
-	var addr string = "0.0.0.0:8000"
+	var addr string = "localhost:8000"
 	server := &http.Server{
 		Addr: addr,
 		WriteTimeout: time.Second * 10,

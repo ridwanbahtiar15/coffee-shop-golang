@@ -16,6 +16,13 @@ func New(db *sqlx.DB) *gin.Engine {
 	})
 
 	RouterCategories(router, db)
+	RouterDeliveries(router, db)
+	RouterPaymentmethods(router, db)
+	RouterPromos(router, db)
+	RouterRoles(router, db)
+	RouterUsers(router, db)
+	RouterProducts(router, db)
+	RouterOrders(router, db)
 
 	return router
 }

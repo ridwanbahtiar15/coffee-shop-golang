@@ -10,11 +10,8 @@ import (
 
 func RouterCategories(g *gin.Engine, db *sqlx.DB) {
 	route := g.Group("/categories")
-	repository := repositories.InitializeRepository(db)
-	handler := handlers.InitializeHandler(repository)
+	repository := repositories.InitializeRepoCategories(db)
+	handler := handlers.InitializeHandlerCategories(repository)
 
 	route.GET("/", handler.GetAllCategories)
-	route.POST("/", handler.CreateCategories)
-	route.PATCH("/:id", handler.UpdateCategories)
-	route.DELETE("/:id", handler.DeleteCategories)
 }
