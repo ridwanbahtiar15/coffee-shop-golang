@@ -23,9 +23,17 @@ func (h *HandlerPromos) GetAllPromos(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
+
+	if len(result) == 0 {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"message": "promo not found",
+		})
+		return
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{
-		"data": result,
 		"message": "get all promo success",
+		"data": result,
 	})
 }
 
@@ -35,13 +43,12 @@ func (h *HandlerPromos) CreateProomos(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, err)
 	}
 
-	result, err := h.RepsitoryCreatePromos(&body)
+	err := h.RepsitoryCreatePromos(&body)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{
-		"data": result,
 		"message": "create promo success",
 	})
 }
@@ -54,20 +61,19 @@ func (h *HandlerPromos) UpdatePromos(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, err)
 	}
 
-	result, err := h.RepsitoryUpdatePromos(&body, id)
+	err := h.RepsitoryUpdatePromos(&body, id)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{
-		"data": result,
 		"message": "update promo success",
 	})
 }
 
 func (h *HandlerPromos) DeletePromos(ctx *gin.Context) {
 	id := ctx.Param("id")
-	result, err := h.RepositoryDeletePromos(id)
+	err := h.RepositoryDeletePromos(id)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
@@ -75,7 +81,6 @@ func (h *HandlerPromos) DeletePromos(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{
-		"data": result,
 		"message": "delete promo success",
 	})
 }

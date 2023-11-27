@@ -25,7 +25,7 @@ type ProductsResponseModel struct {
 	Categories_name 	 string 		`db:"categories_name"`
 }
 
-type Meta struct {
+type MetaProducts struct {
 	Page int
 	TotalData int
 	Next string

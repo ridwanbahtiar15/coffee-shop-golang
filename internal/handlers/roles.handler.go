@@ -21,6 +21,14 @@ func (h *HandlerRoles) GetAllRoles(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
+
+	if len(result) == 0 {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"message": "payment method not found",
+		})
+		return
+	}
+	
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": result,
 		"message": "get all roles success",

@@ -17,3 +17,20 @@ type UsersModel struct {
 	Deleted_at *time.Time `db:"deleted_at"`
 	Is_active    			string     `db:"is_active"`
 }
+
+type UsersResponseModel struct {
+	Users_id        		string     `db:"users_id"`
+	Users_fullname      string     `db:"users_fullname"`
+	Users_email      		string     `db:"users_email"`
+	Users_phone 				string     `db:"users_phone"`
+	Users_address      	string     `db:"users_address"`
+	Users_image      		string     `db:"users_image"`
+	Roles_name      		string   		`db:"roles_name"`
+}
+
+type MetaUsers struct {
+	Page int
+	TotalData int
+	Next string
+	Prev string
+}

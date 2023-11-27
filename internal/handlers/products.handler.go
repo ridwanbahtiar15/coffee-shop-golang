@@ -42,7 +42,6 @@ func (h *HandlerProducts) GetAllProducts(ctx *gin.Context) {
 		}
 
 		result, err := h.RepsitoryGetFilterProducts(name, category, minrange, maxrange, page, limit, sort)
-		fmt.Println(err)
 
 		if len(result) == 0 {
 			ctx.JSON(http.StatusNotFound, gin.H{
@@ -51,22 +50,18 @@ func (h *HandlerProducts) GetAllProducts(ctx *gin.Context) {
 			return
 		}
 
-		count, err := h.RepositryCountProducts(name, category, minrange, maxrange)
-
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, err)
-			fmt.Println(err)
 			return
 		}
+
+		count, _ := h.RepositoryCountProducts(name, category, minrange, maxrange)
 
 		totalData, _ := strconv.Atoi(count[0])
 		resultLimit, _ := strconv.Atoi(limit)
 		resultPage, _ := strconv.Atoi(page)
 		isLastPage := math.Ceil(float64(totalData) / float64(resultLimit))
 		resultIsLastPage := int(isLastPage) <= resultPage
-		fmt.Println(resultIsLastPage)
-
-		// fmt.Println(ctx.Request.URL.Path)
 		
 		linkNext := fmt.Sprintf("%s?page=%d&limit=%d", ctx.Request.URL.Path, resultPage + 1, resultLimit) 
 		linkPrev := fmt.Sprintf("%s?page=%d&limit=%d", ctx.Request.URL.Path, resultPage - 1, resultLimit) 
@@ -86,7 +81,7 @@ func (h *HandlerProducts) GetAllProducts(ctx *gin.Context) {
 			isPrev = linkPrev
 		}
 
-		data := models.Meta{}
+		data := models.MetaProducts{}
 		data.Page = resultPage
 		data.TotalData = totalData
 		data.Next = isNext

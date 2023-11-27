@@ -21,6 +21,14 @@ func (h *HandlerDeliveries) GetAllDeliveries(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
+
+	if len(result) == 0 {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"message": "delivery not found",
+		})
+		return
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": result,
 		"message": "get all delivery success",

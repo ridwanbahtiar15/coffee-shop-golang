@@ -175,12 +175,12 @@ func (r *ProductsRepository) RepsitoryGetFilterProducts(name string, category st
 	return result, nil
 }
 
-func (r ProductsRepository) RepositryCountProducts(name string, category string, minrange string, maxrange string) ([]string, error) {
+func (r *ProductsRepository) RepositoryCountProducts(name string, category string, minrange string, maxrange string) ([]string, error) {
 	if minrange == "" { minrange = "10000" }
 	if maxrange == "" { maxrange = "120000" }
 	count := []string{}
 
-	query := `SELECT COUNT(*) from products p`
+	query := `SELECT COUNT(*) FROM products p`
 
 	if name != "" && category != "" {
 		query += ` JOIN categories c ON p.categories_id = c.categories_id 

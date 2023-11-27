@@ -23,6 +23,14 @@ func (h *HandlerOrders) GetAllOrders(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
+
+	if len(result) == 0 {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"message": "order not found",
+		})
+		return
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"data": result,
 		"message": "get all order success",
@@ -41,6 +49,7 @@ func (h *HandlerOrders) CreateOrders(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "create order success",
 	})
