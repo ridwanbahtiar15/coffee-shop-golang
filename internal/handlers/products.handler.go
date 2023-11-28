@@ -64,7 +64,32 @@ func (h *HandlerProducts) GetAllProducts(ctx *gin.Context) {
 		resultIsLastPage := int(isLastPage) <= resultPage
 		
 		linkNext := fmt.Sprintf("%s?page=%d&limit=%d", ctx.Request.URL.Path, resultPage + 1, resultLimit) 
-		linkPrev := fmt.Sprintf("%s?page=%d&limit=%d", ctx.Request.URL.Path, resultPage - 1, resultLimit) 
+		if returnName {
+			linkNext = fmt.Sprintf("%s&name=%s", linkNext, name)
+		}
+		if returnCategory {
+			linkNext = fmt.Sprintf("%s&category=%s", linkNext, category)
+		}
+		if returnMinrange && returnMaxrange {
+			linkNext = fmt.Sprintf("%s&minrange=%s&maxrange=%s", linkNext, minrange, maxrange)
+		}
+		if returnSort {
+			linkNext = fmt.Sprintf("%s&sort=%s", linkNext, sort)
+		}
+
+		linkPrev := fmt.Sprintf("%s?page=%d&limit=%d", ctx.Request.URL.Path, resultPage - 1, resultLimit)
+		if returnName {
+			linkPrev = fmt.Sprintf("%s&name=%s", linkPrev, name)
+		}
+		if returnCategory {
+			linkPrev = fmt.Sprintf("%s&category=%s", linkPrev, category)
+		}
+		if returnMinrange && returnMaxrange {
+			linkPrev = fmt.Sprintf("%s&minrange=%s&maxrange=%s", linkPrev, minrange, maxrange)
+		}
+		if returnSort {
+			linkPrev = fmt.Sprintf("%s&sort=%s", linkPrev, sort)
+		}
 
 		var isNext string
 		var isPrev string
@@ -75,7 +100,7 @@ func (h *HandlerProducts) GetAllProducts(ctx *gin.Context) {
 			isNext = linkNext
 		}
 
-		if resultPage == 1 {
+		if resultPage == 1 || resultPage == 0 {
 			isPrev = "null"
 		} else {
 			isPrev = linkPrev

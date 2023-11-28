@@ -88,7 +88,15 @@ func (r *UsersRepository) RepositoryGetFilterUsers(name string, page string, lim
 						JOIN roles r ON u.roles_id = r.roles_id`
 
 	if name != "" {
-		query += ` WHERE u.users_fullname LIKE $1 LIMIT $2 OFFSET $3`
+		query += ` WHERE u.users_fullname LIKE $1`
+		switch sort {
+		case "asc":
+			query += ` ORDER BY u.users_fullname ASC LIMIT $2 OFFSET $3`
+		case "desc":
+			query += ` ORDER BY u.users_fullname DESC LIMIT $2 OFFSET $3`
+		default:
+			query += ` ORDER BY u.users_fullname ASC LIMIT $2 OFFSET $3`
+		}
 		offset := newPage * newLimit - newLimit;
 		err := r.Select(&result, query, fmt.Sprintf("%%%s%%", name), newLimit, strconv.Itoa(offset))
 		if err != nil {
@@ -97,7 +105,14 @@ func (r *UsersRepository) RepositoryGetFilterUsers(name string, page string, lim
 		return result, nil
 	}
 
-	query += ` LIMIT $1 OFFSET $2`
+	switch sort {
+	case "asc":
+		query += ` ORDER BY u.users_fullname ASC LIMIT $1 OFFSET $2`
+	case "desc":
+		query += ` ORDER BY u.users_fullname DESC LIMIT $1 OFFSET $2`
+	default:
+		query += ` ORDER BY u.users_fullname ASC LIMIT $1 OFFSET $2`
+	}
 	offset := newPage * newLimit - newLimit;
 	err := r.Select(&result, query, newLimit, strconv.Itoa(offset))
 	if err != nil {

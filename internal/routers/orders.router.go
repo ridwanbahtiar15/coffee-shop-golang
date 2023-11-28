@@ -15,4 +15,5 @@ func RouterOrders(g *gin.Engine, db *sqlx.DB) {
 
 	route.GET("/", handler.GetAllOrders)
 	route.POST("/", handler.CreateOrders)
+	route.PATCH("/:id", handler.UpdateOrders)
 }

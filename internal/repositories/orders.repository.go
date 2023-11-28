@@ -4,6 +4,7 @@ import (
 	"coffee-shop-golang/internal/models"
 	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -17,9 +18,12 @@ func InitializeRepoOrders(db *sqlx.DB) *OrdersRepository {
 	return &cr
 }
 
-func (r *OrdersRepository) RepsitoryGetAllOrders() ([]models.OrdersModel, error) {
-	result := []models.OrdersModel{}
-	query := `SELECT * FROM orders`
+func (r *OrdersRepository) RepositoryGetAllOrders() ([]models.OrdersResponseModel, error) {
+	result := []models.OrdersResponseModel{}
+	query := `SELECT o.orders_id, o.users_id, o.deliveries_id, p.promos_name, 
+						o.payment_methods_id, o.orders_status, o.orders_total
+	 					FROM orders o
+						JOIN promos p ON o.promos_id = p.promos_id`
 	err := r.Select(&result, query)
 	if err != nil {
 		return nil, err
@@ -27,7 +31,7 @@ func (r *OrdersRepository) RepsitoryGetAllOrders() ([]models.OrdersModel, error)
 	return result, nil
 }
 
-func (r *OrdersRepository) RepsitoryCreateOrders(body *models.OrdersModel) (error) {
+func (r *OrdersRepository) RepositoryCreateOrders(body *models.OrdersModel) (error) {
 	var err error
 	var orderId string
 
@@ -68,5 +72,85 @@ func (r *OrdersRepository) RepsitoryCreateOrders(body *models.OrdersModel) (erro
 		fmt.Println(err)
 	}
 
+	return nil
+}
+
+func (r *OrdersRepository) RepositoryGetFilterOrders(orderNumber string, page string, limit string, sort string) ([]models.OrdersResponseModel, error) {
+	newPage, _ := strconv.Atoi("1")
+	newLimit, _ := strconv.Atoi("99")
+
+	if page != "" {
+		newPage, _ = strconv.Atoi(page) 
+	}
+	if limit != "" {
+		newLimit, _ = strconv.Atoi(limit) 
+	}
+
+	result := []models.OrdersResponseModel{}
+	query := `SELECT o.orders_id, o.users_id, o.deliveries_id, p.promos_name, 
+						o.payment_methods_id, o.orders_status, o.orders_total
+	 					FROM orders o
+						JOIN promos p ON o.promos_id = p.promos_id`
+	if orderNumber != "" {
+		query += ` WHERE o.orders_id = $1`
+		switch sort {
+		case "asc":
+			query += ` ORDER BY o.orders_id ASC LIMIT $2 OFFSET $3`
+		case "desc":
+			query += ` ORDER BY o.orders_id DESC LIMIT $2 OFFSET $3`
+		default:
+			query += ` ORDER BY o.orders_id ASC LIMIT $2 OFFSET $3`
+		}
+		offset := newPage * newLimit - newLimit;
+		err := r.Select(&result, query, orderNumber, newLimit, strconv.Itoa(offset))
+		if err != nil {
+			return nil, err
+		}
+		return result, nil
+	}
+
+	switch sort {
+	case "asc":
+		query += ` ORDER BY o.orders_id ASC LIMIT $1 OFFSET $2`
+	case "desc":
+		query += ` ORDER BY o.orders_id DESC LIMIT $1 OFFSET $2`
+	default:
+		query += ` ORDER BY o.orders_id ASC LIMIT $1 OFFSET $2`
+	}
+	offset := newPage * newLimit - newLimit;
+	err := r.Select(&result, query, newLimit, strconv.Itoa(offset))
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (r *OrdersRepository) RepositoryCountOrders(orderNumber string) ([]string, error) {
+	count := []string{}
+	query := `SELECT COUNT(*) FROM orders o`
+
+	if orderNumber != "" {
+		query += ` WHERE o.orders_id = $1`
+		err := r.Select(&count, query, orderNumber)
+		if err != nil {
+			return nil, err
+		}
+		return count, nil
+	}
+
+	err := r.Select(&count, query)
+		if err != nil {
+			return nil, err
+		}
+		return count, nil
+}
+
+func (r *OrdersRepository) RepositoryUpdateOrders(body *models.OrdersModel, id string) (error) {
+	query := `UPDATE orders SET orders_status=:orders_status
+						WHERE orders_id =` + id
+	_, err := r.NamedExec(query, body)
+	if err != nil {
+		return err 
+	}
 	return nil
 }

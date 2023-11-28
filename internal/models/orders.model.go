@@ -4,7 +4,7 @@ import "time"
 
 type OrdersModel struct {
 	Orders_id        					string     `db:"orders_id" form:"orders_id" json:"orders_id"`
-	Users_id      						int     `db:"users_id" form:"users_id" json:"users_id"`
+	Users_id      						string     `db:"users_id" form:"users_id" json:"users_id"`
 	Deliveries_id     				string     `db:"deliveries_id" form:"deliveries_id" json:"deliveries_id"`
 	Promos_id      						string     `db:"promos_id" form:"promos_id" json:"promos_id"`
 	Payment_methods_id    		string     `db:"payment_methods_id" form:"payment_methods_id" json:"payment_methods_id"`
@@ -18,4 +18,22 @@ type OrdersModel struct {
 	Hot_or_ice  string     `db:"hot_or_ice" form:"hot_or_ice" json:"hot_or_ice"`
 	Created_at *time.Time `db:"created_at"`
 	Updated_at *time.Time `db:"updated_at"`
+}
+
+
+type OrdersResponseModel struct {
+	Orders_id        					string     `db:"orders_id"`
+	Users_id      						string     		`db:"users_id"`
+	Deliveries_id     				string     `db:"deliveries_id"`
+	Promos_name      						string     `db:"promos_name"`
+	Payment_methods_id    		string     `db:"payment_methods_id"`
+	Orders_status      				string     `db:"orders_status"`
+	Orders_total      				string     `db:"orders_total"`
+}
+
+type MetaOrders struct {
+	Page int
+	TotalData int
+	Next string
+	Prev string
 }

@@ -20,7 +20,6 @@ func InitializeHandlerUsers(r *repositories.UsersRepository) *HandlerUsers {
 }
 
 func (h *HandlerUsers) GetAllUsers(ctx *gin.Context) {
-
 	name, returnName := ctx.GetQuery("name")
 	page, returnPage := ctx.GetQuery("page")
 	limit, returnLimit := ctx.GetQuery("limit")
@@ -42,8 +41,6 @@ func (h *HandlerUsers) GetAllUsers(ctx *gin.Context) {
 		}
 
 		count, err := h.RepositoryCountUsers(name)
-		fmt.Println(count)
-
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, err)
 			return
@@ -55,8 +52,15 @@ func (h *HandlerUsers) GetAllUsers(ctx *gin.Context) {
 		isLastPage := math.Ceil(float64(totalData) / float64(resultLimit))
 		resultIsLastPage := int(isLastPage) <= resultPage
 		
-		linkNext := fmt.Sprintf("%s?page=%d&limit=%d", ctx.Request.URL.Path, resultPage + 1, resultLimit) 
-		linkPrev := fmt.Sprintf("%s?page=%d&limit=%d", ctx.Request.URL.Path, resultPage - 1, resultLimit) 
+		linkNext := fmt.Sprintf("%s?page=%d&limit=%d", ctx.Request.URL.Path, resultPage + 1, resultLimit)
+		if returnSort {
+			linkNext = fmt.Sprintf("%s&sort=%s", linkNext, sort)
+		}
+
+		linkPrev := fmt.Sprintf("%s?page=%d&limit=%d", ctx.Request.URL.Path, resultPage - 1, resultLimit)
+		if returnSort {
+			linkPrev = fmt.Sprintf("%s&sort=%s", linkPrev, sort)
+		}
 
 		var isNext string
 		var isPrev string
@@ -67,7 +71,7 @@ func (h *HandlerUsers) GetAllUsers(ctx *gin.Context) {
 			isNext = linkNext
 		}
 
-		if resultPage == 1 {
+		if resultPage == 1 || resultPage == 0 {
 			isPrev = "null"
 		} else {
 			isPrev = linkPrev
@@ -78,7 +82,6 @@ func (h *HandlerUsers) GetAllUsers(ctx *gin.Context) {
 		data.TotalData = totalData
 		data.Next = isNext
 		data.Prev = isPrev
-
 
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "get product success",
