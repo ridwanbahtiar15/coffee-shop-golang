@@ -24,10 +24,3 @@ type ProductsResponseModel struct {
 	Categories_id      string     `db:"categories_id"`
 	Categories_name 	 string 		`db:"categories_name"`
 }
-
-type MetaProducts struct {
-	Page int
-	TotalData int
-	Next string
-	Prev string
-}

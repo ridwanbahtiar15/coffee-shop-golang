@@ -30,10 +30,3 @@ type OrdersResponseModel struct {
 	Orders_status      				string     `db:"orders_status"`
 	Orders_total      				string     `db:"orders_total"`
 }
-
-type MetaOrders struct {
-	Page int
-	TotalData int
-	Next string
-	Prev string
-}

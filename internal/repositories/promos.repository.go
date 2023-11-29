@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"coffee-shop-golang/internal/models"
+	"database/sql"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -25,6 +26,16 @@ func (r *PromosRepository) RepsitoryGetAllPromos() ([]models.PromosModel, error)
 	return result, nil
 }
 
+func (r *PromosRepository) RepositoryGetPromosById(id string) ([]models.PromosModel, error) {
+	result := []models.PromosModel{}
+	query := `SELECT * FROM promos WHERE promos_id = $1`
+	err := r.Select(&result, query, id)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func (r *PromosRepository) RepsitoryCreatePromos(body *models.PromosModel) (error) {
 	query := `INSERT INTO promos (promos_name, promos_start, promos_end) values (:promos_name, :promos_start, :promos_end)`;
 	_, err := r.NamedExec(query, body)
@@ -35,7 +46,7 @@ func (r *PromosRepository) RepsitoryCreatePromos(body *models.PromosModel) (erro
 }
 
 func (r *PromosRepository) RepsitoryUpdatePromos(body *models.PromosModel, id string) (error) {
-	query := `UPDATE promos SET promos_name=:promos_name, promos_start=:promos_start, promos_end=:promos_end, updated_at = NOW() WHERE promos_id = $4`;
+	query := `UPDATE promos SET promos_name=:promos_name, promos_start=:promos_start, promos_end=:promos_end, updated_at = NOW() WHERE promos_id = ` + id;
 	_, err := r.NamedExec(query, body)
 	if err != nil {
 		return err
@@ -43,11 +54,11 @@ func (r *PromosRepository) RepsitoryUpdatePromos(body *models.PromosModel, id st
 	return nil
 }
 
-func (r *PromosRepository) RepositoryDeletePromos(id string) (error) {
+func (r *PromosRepository) RepositoryDeletePromos(id string) (sql.Result, error) {
 	query := `DELETE FROM promos WHERE promos_id = $1`
-	_, err := r.Exec(query, id)
+	result, err := r.Exec(query, id)
 	if err != nil {
-		return err 
+		return nil, err 
 	}
-	return nil
+	return result, nil
 }

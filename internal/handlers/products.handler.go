@@ -108,17 +108,15 @@ func (h *HandlerProducts) GetAllProducts(ctx *gin.Context) {
 			isPrev = linkPrev
 		}
 
-		data := models.MetaProducts{}
-		data.Page = resultPage
-		data.TotalData = totalData
-		data.Next = isNext
-		data.Prev = isPrev
-
-
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "get product success",
 			"result": result,
-			"meta": data,
+			"meta": gin.H{
+				"page": resultPage,
+				"totalData": totalData,
+				"next": isNext,
+				"prev": isPrev,
+			},
 		})
 		return
 	}
@@ -154,7 +152,6 @@ func (h *HandlerProducts) CreateProducts(ctx *gin.Context) {
 	}
 
 	id, err := h.RepositoryCreateProducts(&body)
-	fmt.Println(err)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
@@ -185,7 +182,6 @@ func (h *HandlerProducts) CreateProducts(ctx *gin.Context) {
 		return
 	}
 	defer file.Close()
-
 	
 	publicId := fmt.Sprintf("%s_%s-%s", "product", fieldName, strconv.Itoa(id))
 	folder := ""
@@ -254,8 +250,65 @@ func (h *HandlerProducts) UpdateProducts(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
+	
+	cld, err := helpers.InitCloudinary()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	fieldName := "products_image"
+	formFile, err := ctx.FormFile(fieldName)
+
+	if formFile == nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "update product success",
+		})
+		return
+	}
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	file, err := formFile.Open()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	defer file.Close()
+	
+	publicId := fmt.Sprintf("%s_%s-%s", "product", fieldName, id)
+	folder := ""
+	res, errs := cld.Uploader(ctx, file, publicId, folder)
+
+	if errs != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": errs.Error(),
+		})
+		return
+	}
+
+	errUpdate := h.RepositoryUpdateImgProducts(res.SecureURL, id)
+	if errUpdate != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": errUpdate.Error(),
+		})
+		return
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "update product success",
+		"data": gin.H{
+			"url": res.SecureURL,
+		},
 	})
 }
 

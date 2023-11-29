@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"coffee-shop-golang/internal/helpers"
 	"coffee-shop-golang/internal/models"
 	"coffee-shop-golang/internal/repositories"
 	"fmt"
@@ -77,16 +78,15 @@ func (h *HandlerUsers) GetAllUsers(ctx *gin.Context) {
 			isPrev = linkPrev
 		}
 
-		data := models.MetaUsers{}
-		data.Page = resultPage
-		data.TotalData = totalData
-		data.Next = isNext
-		data.Prev = isPrev
-
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "get product success",
 			"result": result,
-			"meta": data,
+			"meta": gin.H{
+				"page": resultPage,
+				"totalData": totalData,
+				"next": isNext,
+				"prev": isPrev,
+			},
 		})
 		return
 	}
@@ -165,18 +165,82 @@ func (h *HandlerUsers) UpdateUsers(ctx *gin.Context) {
 	}
 
 	errs := h.RepositoryUpdateUsers(&body, id)
+	fmt.Println(errs)
 	if errs != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
+	cld, err := helpers.InitCloudinary()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	fieldName := "users_image"
+	formFile, err := ctx.FormFile(fieldName)
+
+	if formFile == nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "update user success",
+		})
+		return
+	}
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	file, err := formFile.Open()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	defer file.Close()
+	
+	publicId := fmt.Sprintf("%s_%s-%s", "user-profile", fieldName, id)
+	folder := ""
+	res, errs := cld.Uploader(ctx, file, publicId, folder)
+
+	if errs != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": errs.Error(),
+		})
+		return
+	}
+
+	errUpdate := h.RepositoryUpdateImgUsers(res.SecureURL, id)
+	if errUpdate != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": errUpdate.Error(),
+		})
+		return
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "update user success",
+		"data": gin.H{
+			"url": res.SecureURL,
+		},
 	})
 }
 
 func (h *HandlerUsers) DeleteUsers(ctx *gin.Context) {
 	id := ctx.Param("id")
-	err := h.RepositoryDeleteUsers(id)
+	res, err := h.RepositoryDeleteUsers(id)
+
+	if rows, _ := res.RowsAffected(); rows == 0 {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"message": "id user not found",
+		})
+		return
+	}
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)

@@ -80,16 +80,15 @@ func (h *HandlerOrders) GetAllOrders(ctx *gin.Context) {
 			isPrev = linkPrev
 		}
 
-		data := models.MetaOrders{}
-		data.Page = resultPage
-		data.TotalData = totalData
-		data.Next = isNext
-		data.Prev = isPrev
-
 		ctx.JSON(http.StatusOK, gin.H{
 			"message": "get order success",
 			"result": result,
-			"meta": data,
+			"meta": gin.H{
+				"page": resultPage,
+				"totalData": totalData,
+				"next": isNext,
+				"prev": isPrev,
+			},
 		})
 		return
 	}

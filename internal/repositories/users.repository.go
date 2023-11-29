@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"coffee-shop-golang/internal/models"
+	"database/sql"
 	"fmt"
 	"strconv"
 
@@ -64,13 +65,22 @@ func (r *UsersRepository) RepositoryUpdateUsers(body *models.UsersModel, id stri
 	return nil
 }
 
-func (r *UsersRepository) RepositoryDeleteUsers(id string) (error) {
-	query := `UPDATE users SET deleted_at = NOW() WHERE users_id = $1`
-	_, err := r.Exec(query, id)
+func (r *UsersRepository) RepositoryUpdateImgUsers(usersImage string, id string) (error) {
+	query := `UPDATE users SET users_image = $1 WHERE users_id = $2`
+	_, err := r.Exec(query, usersImage,  id)
 	if err != nil {
 		return err 
 	}
 	return nil
+}
+
+func (r *UsersRepository) RepositoryDeleteUsers(id string) (sql.Result, error) {
+	query := `UPDATE users SET deleted_at = NOW() WHERE users_id = $1`
+	result, err := r.Exec(query, id)
+	if err != nil {
+		return nil, err 
+	}
+	return result, nil
 }
 
 func (r *UsersRepository) RepositoryGetFilterUsers(name string, page string, limit string, sort string) ([]models.UsersResponseModel, error) {

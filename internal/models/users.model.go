@@ -45,10 +45,3 @@ type JwtUsers struct {
 	Users_id string `db:"users_id" form:"users_id" json:"users_id"`
 	Token_jwt string `db:"token_jwt" form:"token_jwt" json:"token_jwt"`
 }
-
-type MetaUsers struct {
-	Page int
-	TotalData int
-	Next string
-	Prev string
-}
