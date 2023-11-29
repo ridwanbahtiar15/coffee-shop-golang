@@ -92,7 +92,7 @@ func (h *HandlerUsers) GetAllUsers(ctx *gin.Context) {
 	}
 	
 
-	result, err := h.RepsitoryGetAllUsers()
+	result, err := h.RepositoryGetAllUsers()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
@@ -105,7 +105,7 @@ func (h *HandlerUsers) GetAllUsers(ctx *gin.Context) {
 
 func (h *HandlerUsers) GetUsersById(ctx *gin.Context) {
 	id := ctx.Param("id")
-	result, err := h.RepsitoryUsersById(id)
+	result, err := h.RepositoryUsersById(id)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
@@ -122,7 +122,7 @@ func (h *HandlerUsers) CreateUsers(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, err)
 	}
 
-	err := h.RepsitoryCreateUsers(&body)
+	err := h.RepositoryCreateUsers(&body)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
@@ -140,8 +140,32 @@ func (h *HandlerUsers) UpdateUsers(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, err)
 	}
 
-	err := h.RepsitoryUpdateUsers(&body, id)
+	result, err := h.RepositoryUsersById(id)
 	if err != nil {
+		fmt.Println(err)
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	// cek partial
+	if body.Users_fullname == "" {
+		body.Users_fullname = result[0].Users_fullname
+	}
+	if body.Users_password == "" {
+		body.Users_password = result[0].Users_password
+	}
+	if body.Users_phone == "" {
+		body.Users_phone = result[0].Users_phone
+	}
+	if body.Users_address == "" {
+		body.Users_address = result[0].Users_address
+	}
+	if body.Users_image == "" {
+		body.Users_image = result[0].Users_image
+	}
+
+	errs := h.RepositoryUpdateUsers(&body, id)
+	if errs != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}

@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"coffee-shop-golang/internal/models"
+	"database/sql"
 	"fmt"
 	"strconv"
 
@@ -17,7 +18,7 @@ func InitializeRepoProducts(db *sqlx.DB) *ProductsRepository {
 	return &cr
 }
 
-func (r *ProductsRepository) RepsitoryGetAllProducts() ([]models.ProductsResponseModel, error) {
+func (r *ProductsRepository) RepositoryGetAllProducts() ([]models.ProductsResponseModel, error) {
 	result := []models.ProductsResponseModel{}
 	query := `SELECT p.products_id, p.products_name, p.products_price, p.products_desc,
 						p.products_stock, p.products_image, p.categories_id, c.categories_name FROM products p JOIN categories c on p.categories_id = c.categories_id ORDER BY p.products_id ASC`
@@ -28,7 +29,7 @@ func (r *ProductsRepository) RepsitoryGetAllProducts() ([]models.ProductsRespons
 	return result, nil
 }
 
-func (r *ProductsRepository) RepsitoryProductsById(id string) ([]models.ProductsResponseModel, error) {
+func (r *ProductsRepository) RepositoryProductsById(id string) ([]models.ProductsResponseModel, error) {
 	result := []models.ProductsResponseModel{}
 	query := `SELECT p.products_name, p.products_price, p.products_desc, 
 						p.products_stock, p.products_image, p.categories_id, c.categories_name FROM products p join categories c on p.categories_id = c.categories_id WHERE p.products_id = $1`
@@ -39,7 +40,7 @@ func (r *ProductsRepository) RepsitoryProductsById(id string) ([]models.Products
 	return result, nil
 }
 
-func (r *ProductsRepository) RepsitoryCreateProducts(body *models.ProductsModel) ( error) {
+func (r *ProductsRepository) RepositoryCreateProducts(body *models.ProductsModel) ( error) {
 	query := `INSERT INTO products 
 						(products_name, products_price, products_desc, products_stock, products_image, categories_id) 
 						VALUES (:products_name, :products_price, :products_desc, :products_stock, :products_image, :categories_id)`
@@ -50,7 +51,7 @@ func (r *ProductsRepository) RepsitoryCreateProducts(body *models.ProductsModel)
 	return nil
 }
 
-func (r *ProductsRepository) RepsitoryUpdateProducts(body *models.ProductsModel, id string) (error) {
+func (r *ProductsRepository) RepositoryUpdateProducts(body *models.ProductsModel, id string) (error) {
 	query := `UPDATE products SET products_name=:products_name,
 						products_price=:products_price, products_desc=:products_desc, products_stock=:products_stock, products_image=:products_image, categories_id=:categories_id WHERE products_id =` + id
 	_, err := r.NamedExec(query, body)
@@ -60,13 +61,13 @@ func (r *ProductsRepository) RepsitoryUpdateProducts(body *models.ProductsModel,
 	return nil
 }
 
-func (r *ProductsRepository) RepositoryDeleteProducts(id string) (error) {
+func (r *ProductsRepository) RepositoryDeleteProducts(id string) (sql.Result, error) {
 	query := `DELETE FROM products WHERE products_id = $1`
-	_, err := r.Exec(query, id)
+	result, err := r.Exec(query, id)
 	if err != nil {
-		return err 
+		return nil, err 
 	}
-	return nil
+	return result, nil
 }
 
 func (r *ProductsRepository) RepsitoryGetFilterProducts(name string, category string, minrange string, maxrange string, page string, limit string, sort string) ([]models.ProductsResponseModel, error) {

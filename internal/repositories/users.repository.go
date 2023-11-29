@@ -17,7 +17,7 @@ func InitializeRepoUsers(db *sqlx.DB) *UsersRepository {
 	return &cr
 }
 
-func (r *UsersRepository) RepsitoryGetAllUsers() ([]models.UsersResponseModel, error) {
+func (r *UsersRepository) RepositoryGetAllUsers() ([]models.UsersResponseModel, error) {
 	result := []models.UsersResponseModel{}
 	query := `SELECT u.users_id, u.users_fullname, u.users_email, u.users_phone, 
 						u.users_address, u.users_image, r.roles_name 
@@ -32,10 +32,13 @@ func (r *UsersRepository) RepsitoryGetAllUsers() ([]models.UsersResponseModel, e
 	return result, nil
 }
 
-func (r *UsersRepository) RepsitoryUsersById(id string) ([]models.UsersResponseModel, error) {
-	result := []models.UsersResponseModel{}
+func (r *UsersRepository) RepositoryUsersById(id string) ([]models.UsersGetByIdResponseModel, error) {
+	result := []models.UsersGetByIdResponseModel{}
 	query := `SELECT u.users_fullname, u.users_email, u.users_password, u.users_phone, 
-						u.users_address, u.users_image, u.roles_id FROM users u WHERE users_id = $1`
+						u.users_address, u.users_image, r.roles_name 
+						FROM users u
+						JOIN roles r on u.roles_id = r.roles_id
+						WHERE users_id = $1`
 	err := r.Select(&result, query, id)
 	if err != nil {
 		return nil, err
@@ -43,7 +46,7 @@ func (r *UsersRepository) RepsitoryUsersById(id string) ([]models.UsersResponseM
 	return result, nil
 }
 
-func (r *UsersRepository) RepsitoryCreateUsers(body *models.UsersModel) (error) {
+func (r *UsersRepository) RepositoryCreateUsers(body *models.UsersModel) (error) {
 	query := `INSERT INTO users (users_fullname, users_email, users_password, users_phone, users_address, users_image, roles_id) VALUES (:users_fullname, :users_email, :users_password, :users_phone, :users_address, :users_image, :roles_id)`
 	_, err := r.NamedExec(query, body)
 	if err != nil {
@@ -52,7 +55,7 @@ func (r *UsersRepository) RepsitoryCreateUsers(body *models.UsersModel) (error) 
 	return nil
 }
 
-func (r *UsersRepository) RepsitoryUpdateUsers(body *models.UsersModel, id string) (error) {
+func (r *UsersRepository) RepositoryUpdateUsers(body *models.UsersModel, id string) (error) {
 	query := `UPDATE users SET users_fullname=:users_fullname, users_password=:users_password, users_phone=:users_phone, users_address=:users_address, users_image=:users_image, updated_at=NOW() WHERE users_id =` + id
 	_, err := r.NamedExec(query, body)
 	if err != nil {

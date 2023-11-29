@@ -28,6 +28,24 @@ type UsersResponseModel struct {
 	Roles_name      		string   		`db:"roles_name"`
 }
 
+type UsersGetByIdResponseModel struct {
+	UsersResponseModel
+	Users_password string `db:"users_password"`
+}
+
+type GetUserInfoModel struct {
+	Users_id        		string     `db:"users_id"`
+	Users_fullname      string     `db:"users_fullname" form:"users_fullname" json:"users_fullname"`
+	Users_email      		string     `db:"users_email" form:"users_email" json:"users_email"`
+	Users_password      string     `db:"users_password" form:"users_password" json:"users_password"`
+	Roles_id      			string     `db:"roles_id"`
+}
+
+type JwtUsers struct {
+	Users_id string `db:"users_id" form:"users_id" json:"users_id"`
+	Token_jwt string `db:"token_jwt" form:"token_jwt" json:"token_jwt"`
+}
+
 type MetaUsers struct {
 	Page int
 	TotalData int

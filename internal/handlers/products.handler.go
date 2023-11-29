@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lib/pq"
 )
 
 type HandlerProducts struct {
@@ -121,7 +122,7 @@ func (h *HandlerProducts) GetAllProducts(ctx *gin.Context) {
 		return
 	}
 
-	result, err := h.RepsitoryGetAllProducts()
+	result, err := h.RepositoryGetAllProducts()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
@@ -134,7 +135,7 @@ func (h *HandlerProducts) GetAllProducts(ctx *gin.Context) {
 
 func (h *HandlerProducts) GetProductsById(ctx *gin.Context) {
 	id := ctx.Param("id")
-	result, err := h.RepsitoryProductsById(id)
+	result, err := h.RepositoryProductsById(id)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
@@ -151,7 +152,7 @@ func (h *HandlerProducts) CreateProducts(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, err)
 	}
 
-	err := h.RepsitoryCreateProducts(&body)
+	err := h.RepositoryCreateProducts(&body)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
@@ -169,8 +170,35 @@ func (h *HandlerProducts) UpdateProducts(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, err)
 	}
 
-	err := h.RepsitoryUpdateProducts(&body, id)
+	result, err := h.RepositoryProductsById(id)
 	if err != nil {
+		fmt.Println(err)
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	// cek partial
+	if body.Products_name == "" {
+		body.Products_name = result[0].Products_name
+	}
+	if body.Products_price == "" {
+		body.Products_price = result[0].Products_price
+	}
+	if body.Products_desc == "" {
+		body.Products_desc = result[0].Products_desc
+	}
+	if body.Products_stock == "" {
+		body.Products_stock = result[0].Products_stock
+	}
+	if body.Products_image == "" {
+		body.Products_image = result[0].Products_image
+	}
+	if body.Categories_id == "" {
+		body.Categories_id = result[0].Categories_id
+	}
+
+	errs := h.RepositoryUpdateProducts(&body, id)
+	if errs != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -181,9 +209,23 @@ func (h *HandlerProducts) UpdateProducts(ctx *gin.Context) {
 
 func (h *HandlerProducts) DeleteProducts(ctx *gin.Context) {
 	id := ctx.Param("id")
-	err := h.RepositoryDeleteProducts(id)
+	res, err := h.RepositoryDeleteProducts(id)
+
+	if rows, _ := res.RowsAffected(); rows == 0 {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"message": "id product not found",
+		})
+		return
+	}
 
 	if err != nil {
+		pgErr, _ := err.(*pq.Error)
+		if pgErr.Code == "23503" {
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"message": "error constraint",
+			})
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}

@@ -2,6 +2,7 @@ package routers
 
 import (
 	"coffee-shop-golang/internal/handlers"
+	"coffee-shop-golang/internal/middlewares"
 	"coffee-shop-golang/internal/repositories"
 
 	"github.com/gin-gonic/gin"
@@ -12,10 +13,11 @@ func RouterUsers(g *gin.Engine, db *sqlx.DB) {
 	route := g.Group("/users")
 	repository := repositories.InitializeRepoUsers(db)
 	handler := handlers.InitializeHandlerUsers(repository)
+	repositoryAuth := repositories.InitializeRepoAuth(db)
 
-	route.GET("/", handler.GetAllUsers)
-	route.GET("/:id", handler.GetUsersById)
-	route.POST("/", handler.CreateUsers)
-	route.PATCH("/:id", handler.UpdateUsers)
-	route.DELETE("/:id", handler.DeleteUsers)
+	route.GET("/", middlewares.JWTGate([]string{"1"}, repositoryAuth), handler.GetAllUsers)
+	route.GET("/:id", middlewares.JWTGate([]string{"1"}, repositoryAuth), handler.GetUsersById)
+	route.POST("/", middlewares.JWTGate([]string{"1"}, repositoryAuth), handler.CreateUsers)
+	route.PATCH("/:id", middlewares.JWTGate([]string{"1"}, repositoryAuth), handler.UpdateUsers)
+	route.DELETE("/:id", middlewares.JWTGate([]string{"1"}, repositoryAuth), handler.DeleteUsers)
 }
