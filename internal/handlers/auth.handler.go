@@ -97,7 +97,7 @@ func (h *HandlerAuth) LoginUsers(ctx *gin.Context) {
 		return
 	}
 
-	message := fmt.Sprintf("Selamat Datang %s", result[0].Users_fullname)
+	message := fmt.Sprintf("Welcome %s", result[0].Users_fullname)
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": message,
 		"data": gin.H{

@@ -20,7 +20,7 @@ func NewPayload(users_id string, roles_id string, ) *claims {
 		Roles_id: roles_id,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    os.Getenv("JWT_ISSUER"),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 2)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 30)),
 		},
 	}
 }

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"coffee-shop-golang/internal/helpers"
 	"coffee-shop-golang/internal/models"
 	"coffee-shop-golang/internal/repositories"
 	"fmt"
@@ -152,13 +153,64 @@ func (h *HandlerProducts) CreateProducts(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, err)
 	}
 
-	err := h.RepositoryCreateProducts(&body)
+	id, err := h.RepositoryCreateProducts(&body)
+	fmt.Println(err)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
+
+	cld, err := helpers.InitCloudinary()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	fieldName := "products_image"
+	formFile, err := ctx.FormFile(fieldName)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	file, err := formFile.Open()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	defer file.Close()
+
+	
+	publicId := fmt.Sprintf("%s_%s-%s", "product", fieldName, strconv.Itoa(id))
+	folder := ""
+	res, errs := cld.Uploader(ctx, file, publicId, folder)
+
+	if errs != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": errs.Error(),
+		})
+		return
+	}
+
+	errUpdate := h.RepositoryUpdateImgProducts(res.SecureURL, strconv.Itoa(id))
+	if errUpdate != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": errUpdate.Error(),
+		})
+		return
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "create product success",
+		"data": gin.H{
+			"url": res.SecureURL,
+		},
 	})
 }
 

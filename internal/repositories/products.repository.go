@@ -40,11 +40,26 @@ func (r *ProductsRepository) RepositoryProductsById(id string) ([]models.Product
 	return result, nil
 }
 
-func (r *ProductsRepository) RepositoryCreateProducts(body *models.ProductsModel) ( error) {
+func (r *ProductsRepository) RepositoryCreateProducts(body *models.ProductsModel) (int, error) {
+	var id int
 	query := `INSERT INTO products 
-						(products_name, products_price, products_desc, products_stock, products_image, categories_id) 
-						VALUES (:products_name, :products_price, :products_desc, :products_stock, :products_image, :categories_id)`
-	_, err := r.NamedExec(query, body)
+						(products_name, products_price, products_desc, products_stock, categories_id) 
+						VALUES 
+						(:products_name, :products_price, :products_desc, :products_stock, :categories_id) 
+						RETURNING products_id`
+	result, err := r.NamedQuery(query, body)
+	if err != nil {
+		return 0, err 
+	}
+	if result.Next() {
+    result.Scan(&id)
+}
+	return id, nil
+}
+
+func (r *ProductsRepository) RepositoryUpdateImgProducts(productImg string, id string) (error) {
+	query := `UPDATE products SET products_image = $1 WHERE products_id = $2`
+	_, err := r.Exec(query, productImg,  id)
 	if err != nil {
 		return err 
 	}
