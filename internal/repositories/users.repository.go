@@ -47,18 +47,20 @@ func (r *UsersRepository) RepositoryUsersById(id string) ([]models.UsersGetByIdR
 	return result, nil
 }
 
-func (r *UsersRepository) RepositoryCreateUsers(body *models.UsersModel) (error) {
-	query := `INSERT INTO users (users_fullname, users_email, users_password, users_phone, users_address, users_image, roles_id) VALUES (:users_fullname, :users_email, :users_password, :users_phone, :users_address, :users_image, :roles_id)`
-	_, err := r.NamedExec(query, body)
+func (r *UsersRepository) RepositoryCreateUsers(body *models.UsersModel, hashedPassword string) (int, error) {
+	var id int
+	query := `INSERT INTO users (users_fullname, users_email, users_password, users_phone, users_address, users_image, roles_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING users_id`
+	err := r.QueryRow(query, body.Users_fullname, body.Users_email, hashedPassword, body.Users_phone, body.Users_address, body.Users_image, body.Roles_id).Scan(&id)
 	if err != nil {
-		return err 
+		return 0, err 
 	}
-	return nil
+	return id, nil
 }
 
-func (r *UsersRepository) RepositoryUpdateUsers(body *models.UsersModel, id string) (error) {
-	query := `UPDATE users SET users_fullname=:users_fullname, users_password=:users_password, users_phone=:users_phone, users_address=:users_address, users_image=:users_image, updated_at=NOW() WHERE users_id =` + id
-	_, err := r.NamedExec(query, body)
+func (r *UsersRepository) RepositoryUpdateUsers(body *models.UsersModel, hashedPassword string, id string) (error) {
+	query := `UPDATE users SET users_fullname = $1, users_password = $2, users_phone = $3, users_address = $4, users_image = $5, updated_at = NOW() WHERE users_id = $6`
+	values := []any{body.Users_fullname, hashedPassword, body.Users_phone, body.Users_address, body.Users_image, id}
+	_, err := r.Exec(query, values...)
 	if err != nil {
 		return err 
 	}

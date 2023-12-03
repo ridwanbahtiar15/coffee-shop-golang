@@ -4,12 +4,14 @@ import (
 	"coffee-shop-golang/internal/helpers"
 	"coffee-shop-golang/internal/models"
 	"coffee-shop-golang/internal/repositories"
+	"coffee-shop-golang/pkg"
 	"fmt"
 	"math"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lib/pq"
 )
 
 type HandlerUsers struct {
@@ -120,15 +122,96 @@ func (h *HandlerUsers) CreateUsers(ctx *gin.Context) {
 	var body models.UsersModel
 	if err := ctx.ShouldBind(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, err)
+		return
 	}
 
-	err := h.RepositoryCreateUsers(&body)
+	i := pkg.InitHashConfig().UseDefaultConfig()
+	hashedPassword, err := i.GenHashedPassword(body.Users_password)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
+
+	id, errs := h.RepositoryCreateUsers(&body, hashedPassword)
+	if errs != nil {
+		pgErr, _ := errs.(*pq.Error)
+		if pgErr.Code == "23505" {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"message": "email or phone alredy registered",
+			})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errs)
+		return
+	}
+
+	cld, err := helpers.InitCloudinary()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	fieldName := "users_image"
+	formFile, err := ctx.FormFile(fieldName)
+
+	urlImage := "Profile.jpg"
+	if formFile == nil {
+		errUpdate := h.RepositoryUpdateImgUsers(urlImage, strconv.Itoa(id))
+		if errUpdate != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": errUpdate.Error(),
+		})
+		return
+	}
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "create user success",
+		})
+		return
+	}
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	file, err := formFile.Open()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	defer file.Close()
+	
+	publicId := fmt.Sprintf("%s_%s-%s", "user-profile", fieldName, strconv.Itoa(id))
+	folder := ""
+	res, errs := cld.Uploader(ctx, file, publicId, folder)
+	urlImage = res.SecureURL
+
+	if errs != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": errs.Error(),
+		})
+		return
+	}
+
+	errUpdate := h.RepositoryUpdateImgUsers(urlImage, strconv.Itoa(id))
+	if errUpdate != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": errUpdate.Error(),
+		})
+		return
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "create user success",
+		"data": gin.H{
+			"url": urlImage,
+		},
 	})
 }
 
@@ -138,6 +221,7 @@ func (h *HandlerUsers) UpdateUsers(ctx *gin.Context) {
 	var body models.UsersModel
 	if err := ctx.ShouldBind(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, err)
+		return
 	}
 
 	result, err := h.RepositoryUsersById(id)
@@ -164,12 +248,19 @@ func (h *HandlerUsers) UpdateUsers(ctx *gin.Context) {
 		body.Users_image = result[0].Users_image
 	}
 
-	errs := h.RepositoryUpdateUsers(&body, id)
-	fmt.Println(errs)
+	i := pkg.InitHashConfig().UseDefaultConfig()
+	hashedPassword, err := i.GenHashedPassword(body.Users_password)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	errs := h.RepositoryUpdateUsers(&body, hashedPassword, id)
 	if errs != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
+
 	cld, err := helpers.InitCloudinary()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{

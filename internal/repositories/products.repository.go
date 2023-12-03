@@ -53,7 +53,7 @@ func (r *ProductsRepository) RepositoryCreateProducts(body *models.ProductsModel
 	}
 	if result.Next() {
     result.Scan(&id)
-}
+	}
 	return id, nil
 }
 
