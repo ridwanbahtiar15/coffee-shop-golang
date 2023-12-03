@@ -1,0 +1,33 @@
+build images
+$ docker build -t imageName dockerfile_dir
+
+build container
+$ docker run --name containerName -p hostPort:containerPort imageName
+
+bisa digunakan -d untuk jalan di background
+
+list container
+$ docker ps
+
+bisa gunakan -a untuk melihat semua container
+
+list images
+$ docker images
+
+list network
+$ docker network ls
+
+inspeksi
+$ docker inspect namaCont/namaImages
+$ docker network inspect namaNet
+
+
+DOCKER COMPOSE
+
+create image, container and/or network based on docker compose
+$ docker compose up
+
+bisa ditambah -d untuk detach dari container
+
+remove image, container and/or network based on docker compose
+$ docker compose down

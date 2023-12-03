@@ -9,7 +9,7 @@ type ProductsModel struct {
 	Products_desc      string     `db:"products_desc" form:"products_desc" json:"products_desc"`
 	Products_stock     string     `db:"products_stock" form:"products_stock" json:"products_stock"`
 	Categories_id     string     `db:"categories_id" form:"categories_id" json:"categories_id"`
-	Products_image     string     `db:"products_image" form:"products_image" json:"products_image"`
+	Products_image     string     `db:"products_image" json:"products_image"`
 	Created_at *time.Time `db:"created_at"`
 	Updated_at *time.Time `db:"updated_at"`
 }

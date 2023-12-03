@@ -149,6 +149,7 @@ func (h *HandlerProducts) CreateProducts(ctx *gin.Context) {
 	var body models.ProductsModel
 	if err := ctx.ShouldBind(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, err)
+		return
 	}
 
 	id, err := h.RepositoryCreateProducts(&body)

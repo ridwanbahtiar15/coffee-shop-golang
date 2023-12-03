@@ -1,0 +1,19 @@
+services:
+  goib:
+    # gunakan image atau build untuk menenentukan image yang digunakan
+    image: coffee-shop-golang-goib
+    # build: .
+    ports:
+      # - "hostPort:containerPort"
+      - "8081:8000"
+    #environtment
+    # - GI_MODE=release
+    # - DB_HOST=host.docker.internal
+    # - GO_ENV=DOCKER
+    networks:
+      - net1
+
+networks:
+  net1:
+    name: my_network
+    external: true
