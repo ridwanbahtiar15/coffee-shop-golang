@@ -3,6 +3,7 @@ package repositories
 import (
 	"coffee-shop-golang/internal/models"
 	"database/sql"
+	"strconv"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -61,4 +62,35 @@ func (r *PromosRepository) RepositoryDeletePromos(id string) (sql.Result, error)
 		return nil, err 
 	}
 	return result, nil
+}
+
+func (r *PromosRepository) RepositoryGetFilterPromos(page string, limit string) ([]models.PromosModel, error) {
+	newPage, _ := strconv.Atoi("1")
+	newLimit, _ := strconv.Atoi("99")
+
+	if page != "" {
+		newPage, _ = strconv.Atoi(page) 
+	}
+	if limit != "" {
+		newLimit, _ = strconv.Atoi(limit) 
+	}
+
+	result := []models.PromosModel{}
+	query := `SELECT * FROM promos WHERE promos_id != '0' LIMIT $1 OFFSET $2`
+	offset := newPage * newLimit - newLimit;
+		err := r.Select(&result, query, newLimit, strconv.Itoa(offset))
+		if err != nil {
+			return nil, err
+		}
+		return result, nil
+}
+
+func (r *PromosRepository) RepositoryCountPromos() ([]string, error) {
+	count := []string{}
+	query := `SELECT COUNT(*) FROM promos WHERE promos_id != '0'`
+	err := r.Select(&count, query)
+		if err != nil {
+			return nil, err
+		}
+		return count, nil
 }

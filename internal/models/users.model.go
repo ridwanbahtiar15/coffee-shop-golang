@@ -36,8 +36,8 @@ type UsersGetByIdResponseModel struct {
 type GetUserInfoModel struct {
 	Users_id        		string     `db:"users_id"`
 	Users_fullname      string     `db:"users_fullname" form:"users_fullname" json:"users_fullname"`
-	Users_email      		string     `db:"users_email" form:"users_email" json:"users_email"`
-	Users_password      string     `db:"users_password" form:"users_password" json:"users_password"`
+	Users_email      		string     `db:"users_email" form:"users_email" json:"users_email" valid:"required"`
+	Users_password      string     `db:"users_password" form:"users_password" json:"users_password" valid:"required"`
 	Roles_id      			string     `db:"roles_id"`
 }
 

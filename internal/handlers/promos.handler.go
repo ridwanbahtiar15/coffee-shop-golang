@@ -4,7 +4,9 @@ import (
 	"coffee-shop-golang/internal/models"
 	"coffee-shop-golang/internal/repositories"
 	"fmt"
+	"math"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,6 +20,70 @@ func InitializeHandlerPromos(r *repositories.PromosRepository) *HandlerPromos {
 }
 
 func (h *HandlerPromos) GetAllPromos(ctx *gin.Context) {
+	page, returnPage := ctx.GetQuery("page")
+	limit, returnLimit := ctx.GetQuery("limit")
+
+	if returnPage || returnLimit {
+		result, err := h.RepositoryGetFilterPromos(page, limit)
+		fmt.Println(err)
+
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, err)
+			return
+		}
+
+		if len(result) == 0 {
+			ctx.JSON(http.StatusNotFound, gin.H{
+				"message": "promo not found",
+			})
+			return
+		}
+
+		count, err := h.RepositoryCountPromos()
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, err)
+			return
+		}
+
+		totalData, _ := strconv.Atoi(count[0])
+		resultLimit, _ := strconv.Atoi(limit)
+		resultPage, _ := strconv.Atoi(page)
+		isLastPage := math.Ceil(float64(totalData) / float64(resultLimit))
+		resultIsLastPage := int(isLastPage) <= resultPage
+		
+		linkNext := fmt.Sprintf("%s?page=%d&limit=%d", ctx.Request.URL.Path, resultPage + 1, resultLimit)
+
+		linkPrev := fmt.Sprintf("%s?page=%d&limit=%d", ctx.Request.URL.Path, resultPage - 1, resultLimit)
+
+		var isNext string
+		var isPrev string
+
+		if resultIsLastPage {
+			isNext = "null"
+		} else {
+			isNext = linkNext
+		}
+
+		if resultPage == 1 || resultPage == 0 {
+			isPrev = "null"
+		} else {
+			isPrev = linkPrev
+		}
+
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "get product success",
+			"result": result,
+			"meta": gin.H{
+				"page": resultPage,
+				"totalData": totalData,
+				"next": isNext,
+				"prev": isPrev,
+			},
+		})
+		return
+	}
+
+	
 	result, err := h.RepsitoryGetAllPromos()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)

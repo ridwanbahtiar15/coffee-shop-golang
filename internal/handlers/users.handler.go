@@ -9,6 +9,7 @@ import (
 	"math"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
@@ -339,5 +340,115 @@ func (h *HandlerUsers) DeleteUsers(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "delete user success",
+	})
+}
+
+func (h *HandlerUsers) UserProfile(ctx *gin.Context) {
+	bearerToken := ctx.GetHeader("Authorization")
+	token := strings.Replace(bearerToken, "Bearer ", "", -1)
+	payload, _ := pkg.VerifyToken(token)
+	id := payload.Users_id
+
+	var body models.UsersModel
+	if err := ctx.ShouldBind(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	result, err := h.RepositoryUsersById(id)
+	if err != nil {
+		fmt.Println(err)
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	// cek partial
+	if body.Users_fullname == "" {
+		body.Users_fullname = result[0].Users_fullname
+	}
+	if body.Users_password == "" {
+		body.Users_password = result[0].Users_password
+	}
+	if body.Users_phone == "" {
+		body.Users_phone = result[0].Users_phone
+	}
+	if body.Users_address == "" {
+		body.Users_address = result[0].Users_address
+	}
+	if body.Users_image == "" {
+		body.Users_image = result[0].Users_image
+	}
+
+	i := pkg.InitHashConfig().UseDefaultConfig()
+	hashedPassword, err := i.GenHashedPassword(body.Users_password)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	errs := h.RepositoryUpdateUsers(&body, hashedPassword, id)
+	if errs != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	cld, err := helpers.InitCloudinary()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	fieldName := "users_image"
+	formFile, err := ctx.FormFile(fieldName)
+
+	if formFile == nil {
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "update user success",
+		})
+		return
+	}
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	file, err := formFile.Open()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	defer file.Close()
+	
+	publicId := fmt.Sprintf("%s_%s-%s", "user-profile", fieldName, id)
+	folder := ""
+	res, errs := cld.Uploader(ctx, file, publicId, folder)
+
+	if errs != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": errs.Error(),
+		})
+		return
+	}
+
+	errUpdate := h.RepositoryUpdateImgUsers(res.SecureURL, id)
+	if errUpdate != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": errUpdate.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "update user success",
+		"data": gin.H{
+			"url": res.SecureURL,
+		},
 	})
 }
