@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"coffee-shop-golang/internal/helpers"
 	"coffee-shop-golang/internal/repositories"
 	"net/http"
 
@@ -23,13 +24,8 @@ func (h *HandlerCategories) GetAllCategories(ctx *gin.Context) {
 	}
 
 	if len(result) == 0 {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"message": "category not found",
-		})
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("category not found", nil))
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"data": result,
-		"message": "get all category success",
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("get all category success", result))
 }

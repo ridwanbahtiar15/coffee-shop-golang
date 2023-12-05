@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"coffee-shop-golang/internal/helpers"
 	"coffee-shop-golang/internal/repositories"
 	"net/http"
 
@@ -23,14 +24,9 @@ func (h *HandlerDeliveries) GetAllDeliveries(ctx *gin.Context) {
 	}
 
 	if len(result) == 0 {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"message": "delivery not found",
-		})
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("delivery not found", nil))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"data": result,
-		"message": "get all delivery success",
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("get all delivery success", result))
 }

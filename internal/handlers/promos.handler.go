@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"coffee-shop-golang/internal/helpers"
 	"coffee-shop-golang/internal/models"
 	"coffee-shop-golang/internal/repositories"
 	"fmt"
@@ -34,9 +35,7 @@ func (h *HandlerPromos) GetAllPromos(ctx *gin.Context) {
 		}
 
 		if len(result) == 0 {
-			ctx.JSON(http.StatusNotFound, gin.H{
-				"message": "promo not found",
-			})
+			ctx.JSON(http.StatusNotFound, helpers.GetResponse("promo not found", nil))
 			return
 		}
 
@@ -92,16 +91,11 @@ func (h *HandlerPromos) GetAllPromos(ctx *gin.Context) {
 	}
 
 	if len(result) == 0 {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"message": "promo not found",
-		})
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("promo not found", nil))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "get all promo success",
-		"data": result,
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("get all promo success", result))
 }
 
 func (h *HandlerPromos) CreateProomos(ctx *gin.Context) {
@@ -120,9 +114,7 @@ func (h *HandlerPromos) CreateProomos(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "create promo success",
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("create promo success", nil))
 }
 
 func (h *HandlerPromos) UpdatePromos(ctx *gin.Context) {
@@ -161,9 +153,7 @@ func (h *HandlerPromos) UpdatePromos(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "update promo success",
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("update promo success", nil))
 }
 
 func (h *HandlerPromos) DeletePromos(ctx *gin.Context) {
@@ -171,9 +161,7 @@ func (h *HandlerPromos) DeletePromos(ctx *gin.Context) {
 	res, err := h.RepositoryDeletePromos(id)
 
 	if rows, _ := res.RowsAffected(); rows == 0 {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"message": "id promo not found",
-		})
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("id promo not found", nil))
 		return
 	}
 
@@ -182,7 +170,5 @@ func (h *HandlerPromos) DeletePromos(ctx *gin.Context) {
 		fmt.Println(err)
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "delete promo success",
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("delete promo success", nil))
 }

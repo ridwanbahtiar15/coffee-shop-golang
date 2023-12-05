@@ -37,9 +37,7 @@ func (h *HandlerProducts) GetAllProducts(ctx *gin.Context) {
 		
 		if returnMinrange && returnMaxrange {
 			if minrange >= maxrange {
-				ctx.JSON(http.StatusBadRequest, gin.H{
-					"message": "The range your input is not correct",
-				})
+				ctx.JSON(http.StatusBadRequest, helpers.GetResponse("The range your input is not correct", nil))
 				return
 			}
 		}
@@ -47,9 +45,7 @@ func (h *HandlerProducts) GetAllProducts(ctx *gin.Context) {
 		result, err := h.RepsitoryGetFilterProducts(name, category, minrange, maxrange, page, limit, sort)
 
 		if len(result) == 0 {
-			ctx.JSON(http.StatusNotFound, gin.H{
-				"message": "product not found",
-			})
+			ctx.JSON(http.StatusNotFound, helpers.GetResponse("product not found", nil))
 			return
 		}
 
@@ -127,10 +123,7 @@ func (h *HandlerProducts) GetAllProducts(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "get all product success",
-		"result": result,
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("get all product success", result))
 }
 
 func (h *HandlerProducts) GetProductsById(ctx *gin.Context) {
@@ -140,10 +133,7 @@ func (h *HandlerProducts) GetProductsById(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "get product by id success",
-		"result": result,
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("get product by id success", result))
 }
 
 func (h *HandlerProducts) CreateProducts(ctx *gin.Context) {
@@ -166,26 +156,20 @@ func (h *HandlerProducts) CreateProducts(ctx *gin.Context) {
 
 	cld, err := helpers.InitCloudinary()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(err.Error(), nil))
 		return
 	}
 
 	fieldName := "products_image"
 	formFile, err := ctx.FormFile(fieldName)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(err.Error(), nil))
 		return
 	}
 
 	file, err := formFile.Open()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(err.Error(), nil))
 		return
 	}
 	defer file.Close()
@@ -195,26 +179,17 @@ func (h *HandlerProducts) CreateProducts(ctx *gin.Context) {
 	res, errs := cld.Uploader(ctx, file, publicId, folder)
 
 	if errs != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": errs.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(errs.Error(), nil))
 		return
 	}
 
 	errUpdate := h.RepositoryUpdateImgProducts(res.SecureURL, strconv.Itoa(id))
 	if errUpdate != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": errUpdate.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(errUpdate.Error(), nil))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "create product success",
-		"data": gin.H{
-			"url": res.SecureURL,
-		},
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("create product success", gin.H{ "url": res.SecureURL }))
 }
 
 func (h *HandlerProducts) UpdateProducts(ctx *gin.Context) {
@@ -265,9 +240,7 @@ func (h *HandlerProducts) UpdateProducts(ctx *gin.Context) {
 	
 	cld, err := helpers.InitCloudinary()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(err.Error(), nil))
 		return
 	}
 
@@ -275,24 +248,18 @@ func (h *HandlerProducts) UpdateProducts(ctx *gin.Context) {
 	formFile, err := ctx.FormFile(fieldName)
 
 	if formFile == nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": "update product success",
-		})
+		ctx.JSON(http.StatusOK, helpers.GetResponse("update product success", nil))
 		return
 	}
 
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(err.Error(), nil))
 		return
 	}
 
 	file, err := formFile.Open()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(err.Error(), nil))
 		return
 	}
 	defer file.Close()
@@ -302,9 +269,7 @@ func (h *HandlerProducts) UpdateProducts(ctx *gin.Context) {
 	res, errs := cld.Uploader(ctx, file, publicId, folder)
 
 	if errs != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": errs.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(err.Error(), nil))
 		return
 	}
 
@@ -316,12 +281,7 @@ func (h *HandlerProducts) UpdateProducts(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "update product success",
-		"data": gin.H{
-			"url": res.SecureURL,
-		},
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("update product success", gin.H{ "url": res.SecureURL }))
 }
 
 func (h *HandlerProducts) DeleteProducts(ctx *gin.Context) {
@@ -329,24 +289,18 @@ func (h *HandlerProducts) DeleteProducts(ctx *gin.Context) {
 	res, err := h.RepositoryDeleteProducts(id)
 
 	if rows, _ := res.RowsAffected(); rows == 0 {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"message": "id product not found",
-		})
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("id product not found", nil))
 		return
 	}
 
 	if err != nil {
 		pgErr, _ := err.(*pq.Error)
 		if pgErr.Code == "23503" {
-			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"message": "error constraint",
-			})
+			ctx.JSON(http.StatusInternalServerError, helpers.GetResponse("error constraint", nil))
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "delete product success",
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("delete product success", nil))
 }

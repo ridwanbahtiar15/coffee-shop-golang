@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"coffee-shop-golang/internal/helpers"
 	"coffee-shop-golang/internal/models"
 	"coffee-shop-golang/internal/repositories"
 	"coffee-shop-golang/pkg"
@@ -43,17 +44,13 @@ func (h *HandlerAuth) RegisterUsers(ctx *gin.Context) {
 	if errs != nil {
 		pgErr, _ := errs.(*pq.Error)
 		if pgErr.Code == "23505" {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"message": "email alredy registered",
-			})
+			ctx.JSON(http.StatusBadRequest, helpers.GetResponse("email alredy registered", nil))
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, errs)
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "register success",
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("register success", nil))
 }
 
 func (h *HandlerAuth) LoginUsers(ctx *gin.Context) {
@@ -75,9 +72,7 @@ func (h *HandlerAuth) LoginUsers(ctx *gin.Context) {
 	}
 
 	if len(result) == 0 {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"message": "email not registered",
-		})
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("email not registered", nil))
 		return
 	}
 
@@ -88,9 +83,7 @@ func (h *HandlerAuth) LoginUsers(ctx *gin.Context) {
 		return
 	}
 	if !isValid {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
-			"message": "Email or Password is wrong",
-		})
+		ctx.JSON(http.StatusUnauthorized, helpers.GetResponse("email or password is wrong", nil))
 		return
 	}
 
@@ -103,18 +96,15 @@ func (h *HandlerAuth) LoginUsers(ctx *gin.Context) {
 	}
 
 	message := fmt.Sprintf("Welcome %s", result[0].Users_fullname)
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": message,
-		"data": gin.H{
-			"token": token,
-			"userInfo": gin.H{
-				"users_id": result[0].Users_id,
-				"users_email": result[0].Users_email,
-				"users_fullname": result[0].Users_fullname,
-				"roles_id": result[0].Roles_id,
-			},
+	ctx.JSON(http.StatusOK, helpers.GetResponse(message, gin.H{
+		"token": token,
+		"userInfo": gin.H{
+			"users_id": result[0].Users_id,
+			"users_email": result[0].Users_email,
+			"users_fullname": result[0].Users_fullname,
+			"roles_id": result[0].Roles_id,
 		},
-	})
+	},))
 
 	if errs := h.InsertJwt(result[0].Users_id, token); errs != nil {
 		ctx.JSON(http.StatusInternalServerError, errs.Error())
@@ -130,8 +120,6 @@ func (h *HandlerAuth) LogoutUsers(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "logout success",
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("logout success", nil))
 
 }

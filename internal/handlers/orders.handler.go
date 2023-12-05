@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"coffee-shop-golang/internal/helpers"
 	"coffee-shop-golang/internal/models"
 	"coffee-shop-golang/internal/repositories"
 	"fmt"
@@ -36,9 +37,7 @@ func (h *HandlerOrders) GetAllOrders(ctx *gin.Context) {
 		}
 
 		if len(result) == 0 {
-			ctx.JSON(http.StatusNotFound, gin.H{
-				"message": "user not found",
-			})
+			ctx.JSON(http.StatusNotFound, helpers.GetResponse("user not found", nil))
 			return
 		}
 
@@ -103,16 +102,11 @@ func (h *HandlerOrders) GetAllOrders(ctx *gin.Context) {
 	}
 
 	if len(result) == 0 {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"message": "order not found",
-		})
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("order not found", nil))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"data": result,
-		"message": "get all order success",
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("get all order success", result))
 }
 
 func (h *HandlerOrders) CreateOrders(ctx *gin.Context) {
@@ -127,9 +121,7 @@ func (h *HandlerOrders) CreateOrders(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "create order success",
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("create order success", nil))
 }
 
 func (h *HandlerOrders) UpdateOrders(ctx *gin.Context) {
@@ -150,7 +142,5 @@ func (h *HandlerOrders) UpdateOrders(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "update order success",
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("update order success", nil))
 }

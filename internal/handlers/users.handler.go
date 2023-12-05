@@ -34,9 +34,7 @@ func (h *HandlerUsers) GetAllUsers(ctx *gin.Context) {
 		result, err := h.RepositoryGetFilterUsers(name, page, limit, sort)
 
 		if len(result) == 0 {
-			ctx.JSON(http.StatusNotFound, gin.H{
-				"message": "user not found",
-			})
+			ctx.JSON(http.StatusNotFound, helpers.GetResponse("user not found", nil))
 			return
 		}
 
@@ -83,7 +81,7 @@ func (h *HandlerUsers) GetAllUsers(ctx *gin.Context) {
 		}
 
 		ctx.JSON(http.StatusOK, gin.H{
-			"message": "get product success",
+			"message": "get user success",
 			"result": result,
 			"meta": gin.H{
 				"page": resultPage,
@@ -101,10 +99,7 @@ func (h *HandlerUsers) GetAllUsers(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "get all user success",
-		"data": result,
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("get all user success", result))
 }
 
 func (h *HandlerUsers) GetUsersById(ctx *gin.Context) {
@@ -114,10 +109,7 @@ func (h *HandlerUsers) GetUsersById(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "get user by id success",
-		"data": result,
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("get user by id success", result))
 }
 
 func (h *HandlerUsers) CreateUsers(ctx *gin.Context) {
@@ -143,9 +135,7 @@ func (h *HandlerUsers) CreateUsers(ctx *gin.Context) {
 	if errs != nil {
 		pgErr, _ := errs.(*pq.Error)
 		if pgErr.Code == "23505" {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"message": "email or phone alredy registered",
-			})
+			ctx.JSON(http.StatusBadRequest, helpers.GetResponse("email or phone alredy registered", nil))
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, errs)
@@ -154,9 +144,7 @@ func (h *HandlerUsers) CreateUsers(ctx *gin.Context) {
 
 	cld, err := helpers.InitCloudinary()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(err.Error(), nil))
 		return
 	}
 
@@ -167,29 +155,21 @@ func (h *HandlerUsers) CreateUsers(ctx *gin.Context) {
 	if formFile == nil {
 		errUpdate := h.RepositoryUpdateImgUsers(urlImage, strconv.Itoa(id))
 		if errUpdate != nil {
-			ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": errUpdate.Error(),
-		})
+			ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(errUpdate.Error(), nil))
 		return
 	}
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": "create user success",
-		})
+		ctx.JSON(http.StatusOK, helpers.GetResponse("create user success", nil))
 		return
 	}
 
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(err.Error(), nil))
 		return
 	}
 
 	file, err := formFile.Open()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(err.Error(), nil))
 		return
 	}
 	defer file.Close()
@@ -200,26 +180,19 @@ func (h *HandlerUsers) CreateUsers(ctx *gin.Context) {
 	urlImage = res.SecureURL
 
 	if errs != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": errs.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(errs.Error(), nil))
 		return
 	}
 
 	errUpdate := h.RepositoryUpdateImgUsers(urlImage, strconv.Itoa(id))
 	if errUpdate != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": errUpdate.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(errUpdate.Error(), nil))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "create user success",
-		"data": gin.H{
-			"url": urlImage,
-		},
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("create user success", gin.H{
+		"url": urlImage,
+	}))
 }
 
 func (h *HandlerUsers) UpdateUsers(ctx *gin.Context) {
@@ -272,9 +245,7 @@ func (h *HandlerUsers) UpdateUsers(ctx *gin.Context) {
 	if errs != nil {
 		pgErr, _ := errs.(*pq.Error)
 		if pgErr.Code == "23505" {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"message": "phone alredy registered",
-			})
+			ctx.JSON(http.StatusBadRequest, helpers.GetResponse("phone alredy registered", nil))
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, err)
@@ -283,9 +254,7 @@ func (h *HandlerUsers) UpdateUsers(ctx *gin.Context) {
 
 	cld, err := helpers.InitCloudinary()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(err.Error(), nil))
 		return
 	}
 
@@ -293,24 +262,18 @@ func (h *HandlerUsers) UpdateUsers(ctx *gin.Context) {
 	formFile, err := ctx.FormFile(fieldName)
 
 	if formFile == nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": "update user success",
-		})
+		ctx.JSON(http.StatusOK, helpers.GetResponse("update user success", nil))
 		return
 	}
 
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(err.Error(), nil))
 		return
 	}
 
 	file, err := formFile.Open()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(err.Error(), nil))
 		return
 	}
 	defer file.Close()
@@ -320,26 +283,19 @@ func (h *HandlerUsers) UpdateUsers(ctx *gin.Context) {
 	res, errs := cld.Uploader(ctx, file, publicId, folder)
 
 	if errs != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": errs.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(errs.Error(), nil))
 		return
 	}
 
 	errUpdate := h.RepositoryUpdateImgUsers(res.SecureURL, id)
 	if errUpdate != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": errUpdate.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(errUpdate.Error(), nil))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "update user success",
-		"data": gin.H{
-			"url": res.SecureURL,
-		},
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("update user success", gin.H{
+		"url": res.SecureURL,
+	}))
 }
 
 func (h *HandlerUsers) DeleteUsers(ctx *gin.Context) {
@@ -347,9 +303,7 @@ func (h *HandlerUsers) DeleteUsers(ctx *gin.Context) {
 	res, err := h.RepositoryDeleteUsers(id)
 
 	if rows, _ := res.RowsAffected(); rows == 0 {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"message": "id user not found",
-		})
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("id user not found", nil))
 		return
 	}
 
@@ -357,9 +311,7 @@ func (h *HandlerUsers) DeleteUsers(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "delete user success",
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("delete user success", nil))
 }
 
 func (h *HandlerUsers) UserProfile(ctx *gin.Context) {
@@ -413,9 +365,7 @@ func (h *HandlerUsers) UserProfile(ctx *gin.Context) {
 	if errs != nil {
 		pgErr, _ := errs.(*pq.Error)
 		if pgErr.Code == "23505" {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"message": "phone alredy registered",
-			})
+			ctx.JSON(http.StatusBadRequest, helpers.GetResponse("phone alredy registered", nil))
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, err)
@@ -424,9 +374,7 @@ func (h *HandlerUsers) UserProfile(ctx *gin.Context) {
 
 	cld, err := helpers.InitCloudinary()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(err.Error(), nil))
 		return
 	}
 
@@ -434,24 +382,18 @@ func (h *HandlerUsers) UserProfile(ctx *gin.Context) {
 	formFile, err := ctx.FormFile(fieldName)
 
 	if formFile == nil {
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": "update user success",
-		})
+		ctx.JSON(http.StatusOK, helpers.GetResponse("update user success", nil))
 		return
 	}
 
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(err.Error(), nil))
 		return
 	}
 
 	file, err := formFile.Open()
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(err.Error(), nil))
 		return
 	}
 	defer file.Close()
@@ -461,24 +403,17 @@ func (h *HandlerUsers) UserProfile(ctx *gin.Context) {
 	res, errs := cld.Uploader(ctx, file, publicId, folder)
 
 	if errs != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": errs.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(errs.Error(), nil))
 		return
 	}
 
 	errUpdate := h.RepositoryUpdateImgUsers(res.SecureURL, id)
 	if errUpdate != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": errUpdate.Error(),
-		})
+		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(errUpdate.Error(), nil))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "update user success",
-		"data": gin.H{
-			"url": res.SecureURL,
-		},
-	})
+	ctx.JSON(http.StatusOK, helpers.GetResponse("update user success", gin.H{
+		"url": res.SecureURL,
+	}))
 }
