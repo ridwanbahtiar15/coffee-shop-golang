@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
 )
@@ -126,6 +127,11 @@ func (h *HandlerUsers) CreateUsers(ctx *gin.Context) {
 		return
 	}
 
+	if _, err := govalidator.ValidateStruct(body); err != nil {
+		ctx.JSON(http.StatusBadRequest, err)
+		return
+	}
+
 	i := pkg.InitHashConfig().UseDefaultConfig()
 	hashedPassword, err := i.GenHashedPassword(body.Users_password)
 	if err != nil {
@@ -219,8 +225,13 @@ func (h *HandlerUsers) CreateUsers(ctx *gin.Context) {
 func (h *HandlerUsers) UpdateUsers(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	var body models.UsersModel
+	var body models.UpdateUserModel
 	if err := ctx.ShouldBind(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	if _, err := govalidator.ValidateStruct(body); err != nil {
 		ctx.JSON(http.StatusBadRequest, err)
 		return
 	}
@@ -257,7 +268,15 @@ func (h *HandlerUsers) UpdateUsers(ctx *gin.Context) {
 	}
 
 	errs := h.RepositoryUpdateUsers(&body, hashedPassword, id)
+	fmt.Println(errs)
 	if errs != nil {
+		pgErr, _ := errs.(*pq.Error)
+		if pgErr.Code == "23505" {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"message": "phone alredy registered",
+			})
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -349,15 +368,19 @@ func (h *HandlerUsers) UserProfile(ctx *gin.Context) {
 	payload, _ := pkg.VerifyToken(token)
 	id := payload.Users_id
 
-	var body models.UsersModel
+	var body models.UpdateUserModel
 	if err := ctx.ShouldBind(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	if _, err := govalidator.ValidateStruct(body); err != nil {
 		ctx.JSON(http.StatusBadRequest, err)
 		return
 	}
 
 	result, err := h.RepositoryUsersById(id)
 	if err != nil {
-		fmt.Println(err)
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
@@ -388,6 +411,13 @@ func (h *HandlerUsers) UserProfile(ctx *gin.Context) {
 
 	errs := h.RepositoryUpdateUsers(&body, hashedPassword, id)
 	if errs != nil {
+		pgErr, _ := errs.(*pq.Error)
+		if pgErr.Code == "23505" {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"message": "phone alredy registered",
+			})
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}

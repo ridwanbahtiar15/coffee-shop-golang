@@ -57,9 +57,10 @@ func (r *OrdersRepository) RepositoryCreateOrders(body *models.OrdersModel) (err
 
 	result.Close()
 
-	queryOrderProduct := `insert into orders_products (orders_id, products_id, sizes_id, orders_products_qty, orders_products_subtotal, hot_or_ice) values (:orders_id, :products_id, :sizes_id, :orders_products_qty, :orders_products_subtotal, :hot_or_ice)`
+	queryOrderProduct := `insert into orders_products (orders_id, products_id, sizes_id, orders_products_qty, orders_products_subtotal, hot_or_ice) values ($1, $2, $3, $4, $5, $6)`
+	values := []any{orderId, body.Products_id, body.Sizes_id, body.Orders_products_qty, body.Orders_products_subtotal, body.Hot_or_ice}
 
-	_, execErrOp := tx.NamedExec(queryOrderProduct, body)
+	_, execErrOp := tx.Exec(queryOrderProduct, values...)
 
 	if execErrOp != nil {
 		tx.Rollback()

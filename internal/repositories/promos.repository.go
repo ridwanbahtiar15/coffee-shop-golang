@@ -46,7 +46,7 @@ func (r *PromosRepository) RepsitoryCreatePromos(body *models.PromosModel) (erro
 	return nil
 }
 
-func (r *PromosRepository) RepsitoryUpdatePromos(body *models.PromosModel, id string) (error) {
+func (r *PromosRepository) RepsitoryUpdatePromos(body *models.UpdatePromosModel, id string) (error) {
 	query := `UPDATE promos SET promos_name=:promos_name, promos_start=:promos_start, promos_end=:promos_end, updated_at = NOW() WHERE promos_id = ` + id;
 	_, err := r.NamedExec(query, body)
 	if err != nil {

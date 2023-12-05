@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
 )
@@ -152,6 +153,11 @@ func (h *HandlerProducts) CreateProducts(ctx *gin.Context) {
 		return
 	}
 
+	if _, err := govalidator.ValidateStruct(body); err != nil {
+		ctx.JSON(http.StatusBadRequest, err)
+		return
+	}
+
 	id, err := h.RepositoryCreateProducts(&body)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
@@ -214,9 +220,14 @@ func (h *HandlerProducts) CreateProducts(ctx *gin.Context) {
 func (h *HandlerProducts) UpdateProducts(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	var body models.ProductsModel
+	var body models.UpdateProductsModel
 	if err := ctx.ShouldBind(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	if _, err := govalidator.ValidateStruct(body); err != nil {
+		ctx.JSON(http.StatusBadRequest, err)
+		return
 	}
 
 	result, err := h.RepositoryProductsById(id)

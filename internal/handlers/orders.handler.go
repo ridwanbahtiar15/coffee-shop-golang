@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 )
 
@@ -136,6 +137,11 @@ func (h *HandlerOrders) UpdateOrders(ctx *gin.Context) {
 	id := ctx.Param("id")
 	if err := ctx.ShouldBind(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	if _, err := govalidator.ValidateStruct(body); err != nil {
+		ctx.JSON(http.StatusBadRequest, err)
+		return
 	}
 
 	err := h.RepositoryUpdateOrders(&body, id)

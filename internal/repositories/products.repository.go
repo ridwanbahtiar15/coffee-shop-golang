@@ -66,7 +66,7 @@ func (r *ProductsRepository) RepositoryUpdateImgProducts(productImg string, id s
 	return nil
 }
 
-func (r *ProductsRepository) RepositoryUpdateProducts(body *models.ProductsModel, id string) (error) {
+func (r *ProductsRepository) RepositoryUpdateProducts(body *models.UpdateProductsModel, id string) (error) {
 	query := `UPDATE products SET products_name=:products_name,
 						products_price=:products_price, products_desc=:products_desc, products_stock=:products_stock, products_image=:products_image, categories_id=:categories_id WHERE products_id =` + id
 	_, err := r.NamedExec(query, body)

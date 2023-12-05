@@ -27,6 +27,11 @@ func (h *HandlerAuth) RegisterUsers(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, err)
 	}
 
+	if _, err := govalidator.ValidateStruct(body); err != nil {
+		ctx.JSON(http.StatusBadRequest, err)
+		return
+	}
+
 	i := pkg.InitHashConfig().UseDefaultConfig()
 	hashedPassword, err := i.GenHashedPassword(body.Users_password)
 	if err != nil {

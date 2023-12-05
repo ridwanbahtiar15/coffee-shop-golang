@@ -57,7 +57,7 @@ func (r *UsersRepository) RepositoryCreateUsers(body *models.UsersModel, hashedP
 	return id, nil
 }
 
-func (r *UsersRepository) RepositoryUpdateUsers(body *models.UsersModel, hashedPassword string, id string) (error) {
+func (r *UsersRepository) RepositoryUpdateUsers(body *models.UpdateUserModel, hashedPassword string, id string) (error) {
 	query := `UPDATE users SET users_fullname = $1, users_password = $2, users_phone = $3, users_address = $4, users_image = $5, updated_at = NOW() WHERE users_id = $6`
 	values := []any{body.Users_fullname, hashedPassword, body.Users_phone, body.Users_address, body.Users_image, id}
 	_, err := r.Exec(query, values...)

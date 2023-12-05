@@ -4,7 +4,13 @@ import (
 	"coffee-shop-golang/internal/routers"
 	"coffee-shop-golang/pkg"
 	"log"
+
+	"github.com/asaskevich/govalidator"
 )
+
+func init() {
+	govalidator.SetFieldsRequiredByDefault(true)
+}
 
 func main() {
 	database, err := pkg.PostgreSQLDB()

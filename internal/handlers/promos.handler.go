@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 )
 
@@ -109,6 +110,11 @@ func (h *HandlerPromos) CreateProomos(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, err)
 	}
 
+	if _, err := govalidator.ValidateStruct(body); err != nil {
+		ctx.JSON(http.StatusBadRequest, err)
+		return
+	}
+
 	err := h.RepsitoryCreatePromos(&body)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
@@ -122,9 +128,14 @@ func (h *HandlerPromos) CreateProomos(ctx *gin.Context) {
 func (h *HandlerPromos) UpdatePromos(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	var body models.PromosModel
+	var body models.UpdatePromosModel
 	if err := ctx.ShouldBind(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, err)
+	}
+
+	if _, err := govalidator.ValidateStruct(body); err != nil {
+		ctx.JSON(http.StatusBadRequest, err)
+		return
 	}
 
 	result, errs := h.RepositoryGetPromosById(id)
