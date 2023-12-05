@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS "go-coffeeshop".users_activation;
