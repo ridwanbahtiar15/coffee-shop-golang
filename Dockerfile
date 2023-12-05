@@ -16,7 +16,7 @@ RUN go mod download
 RUN go build -v -o /app/coffee-shop-golang ./cmd/main.go
 
 # Expose port
-EXPOSE 8000
+EXPOSE 8001
 
 # Daftarkan aplikasi
 ENTRYPOINT [ "/app/coffee-shop-golang" ]

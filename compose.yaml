@@ -1,8 +1,8 @@
 services:
   goib:
     # gunakan image atau build untuk menenentukan image yang digunakan
-    image: coffee-shop-golang-goib
-    # build: .
+    # image: coffee-shop-golang-goib
+    build: .
     ports:
       # - "hostPort:containerPort"
       - "8081:8000"
