@@ -24,9 +24,9 @@ func (h *HandlerDeliveries) GetAllDeliveries(ctx *gin.Context) {
 	}
 
 	if len(result) == 0 {
-		ctx.JSON(http.StatusNotFound, helpers.GetResponse("delivery not found", nil))
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("delivery not found", nil, nil))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, helpers.GetResponse("get all delivery success", result))
+	ctx.JSON(http.StatusOK, helpers.GetResponse("get all delivery success", result, nil))
 }

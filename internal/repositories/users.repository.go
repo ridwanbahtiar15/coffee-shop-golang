@@ -33,8 +33,8 @@ func (r *UsersRepository) RepositoryGetAllUsers() ([]models.UsersResponseModel, 
 	return result, nil
 }
 
-func (r *UsersRepository) RepositoryUsersById(id string) ([]models.UsersGetByIdResponseModel, error) {
-	result := []models.UsersGetByIdResponseModel{}
+func (r *UsersRepository) RepositoryUsersById(id string) ([]models.UsersResponseModel, error) {
+	result := []models.UsersResponseModel{}
 	query := `SELECT u.users_fullname, u.users_email, u.users_password, u.users_phone, 
 						u.users_address, u.users_image, r.roles_name 
 						FROM users u

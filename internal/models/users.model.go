@@ -19,19 +19,20 @@ type UsersModel struct {
 }
 
 type UsersResponseModel struct {
-	Users_id        		string     `db:"users_id"`
+	Users_id        		string     `db:"users_id" json:"omitempty"`
 	Users_fullname      string     `db:"users_fullname"`
 	Users_email      		string     `db:"users_email"`
+	Users_password      string     `db:"users_password" json:"omitempty"`
 	Users_phone 				string     `db:"users_phone"`
 	Users_address      	string     `db:"users_address"`
 	Users_image      		string     `db:"users_image"`
 	Roles_name      		string   		`db:"roles_name"`
 }
 
-type UsersGetByIdResponseModel struct {
-	UsersResponseModel
-	Users_password string `db:"users_password"`
-}
+// type UsersGetByIdResponseModel struct {
+// 	UsersResponseModel
+	
+// }
 
 type GetUserInfoModel struct {
 	Users_id        		string     `db:"users_id" valid:"-"`

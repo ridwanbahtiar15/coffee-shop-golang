@@ -44,13 +44,13 @@ func (h *HandlerAuth) RegisterUsers(ctx *gin.Context) {
 	if errs != nil {
 		pgErr, _ := errs.(*pq.Error)
 		if pgErr.Code == "23505" {
-			ctx.JSON(http.StatusBadRequest, helpers.GetResponse("email alredy registered", nil))
+			ctx.JSON(http.StatusBadRequest, helpers.GetResponse("email alredy registered", nil, nil))
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, errs)
 		return
 	}
-	ctx.JSON(http.StatusOK, helpers.GetResponse("register success", nil))
+	ctx.JSON(http.StatusOK, helpers.GetResponse("register success", nil, nil))
 }
 
 func (h *HandlerAuth) LoginUsers(ctx *gin.Context) {
@@ -72,7 +72,7 @@ func (h *HandlerAuth) LoginUsers(ctx *gin.Context) {
 	}
 
 	if len(result) == 0 {
-		ctx.JSON(http.StatusNotFound, helpers.GetResponse("email not registered", nil))
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("email not registered", nil, nil))
 		return
 	}
 
@@ -83,7 +83,7 @@ func (h *HandlerAuth) LoginUsers(ctx *gin.Context) {
 		return
 	}
 	if !isValid {
-		ctx.JSON(http.StatusUnauthorized, helpers.GetResponse("email or password is wrong", nil))
+		ctx.JSON(http.StatusUnauthorized, helpers.GetResponse("email or password is wrong", nil, nil))
 		return
 	}
 
@@ -104,7 +104,7 @@ func (h *HandlerAuth) LoginUsers(ctx *gin.Context) {
 			"users_fullname": result[0].Users_fullname,
 			"roles_id": result[0].Roles_id,
 		},
-	},))
+	}, nil))
 
 	if errs := h.InsertJwt(result[0].Users_id, token); errs != nil {
 		ctx.JSON(http.StatusInternalServerError, errs.Error())
@@ -120,6 +120,6 @@ func (h *HandlerAuth) LogoutUsers(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, helpers.GetResponse("logout success", nil))
+	ctx.JSON(http.StatusOK, helpers.GetResponse("logout success", nil, nil))
 
 }

@@ -35,7 +35,7 @@ func (h *HandlerPromos) GetAllPromos(ctx *gin.Context) {
 		}
 
 		if len(result) == 0 {
-			ctx.JSON(http.StatusNotFound, helpers.GetResponse("promo not found", nil))
+			ctx.JSON(http.StatusNotFound, helpers.GetResponse("promo not found", nil, nil))
 			return
 		}
 
@@ -70,16 +70,12 @@ func (h *HandlerPromos) GetAllPromos(ctx *gin.Context) {
 			isPrev = linkPrev
 		}
 
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": "get product success",
-			"result": result,
-			"meta": gin.H{
-				"page": resultPage,
-				"totalData": totalData,
-				"next": isNext,
-				"prev": isPrev,
-			},
-		})
+		ctx.JSON(http.StatusOK, helpers.GetResponse("get promo success", result, gin.H{
+			"page": resultPage,
+			"totalData": totalData,
+			"next": isNext,
+			"prev": isPrev,
+		}))
 		return
 	}
 
@@ -91,11 +87,11 @@ func (h *HandlerPromos) GetAllPromos(ctx *gin.Context) {
 	}
 
 	if len(result) == 0 {
-		ctx.JSON(http.StatusNotFound, helpers.GetResponse("promo not found", nil))
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("promo not found", nil, nil))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, helpers.GetResponse("get all promo success", result))
+	ctx.JSON(http.StatusOK, helpers.GetResponse("get all promo success", result, nil))
 }
 
 func (h *HandlerPromos) CreateProomos(ctx *gin.Context) {
@@ -114,7 +110,7 @@ func (h *HandlerPromos) CreateProomos(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, helpers.GetResponse("create promo success", nil))
+	ctx.JSON(http.StatusOK, helpers.GetResponse("create promo success", nil, nil))
 }
 
 func (h *HandlerPromos) UpdatePromos(ctx *gin.Context) {
@@ -153,7 +149,7 @@ func (h *HandlerPromos) UpdatePromos(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, helpers.GetResponse("update promo success", nil))
+	ctx.JSON(http.StatusOK, helpers.GetResponse("update promo success", nil, nil))
 }
 
 func (h *HandlerPromos) DeletePromos(ctx *gin.Context) {
@@ -161,7 +157,7 @@ func (h *HandlerPromos) DeletePromos(ctx *gin.Context) {
 	res, err := h.RepositoryDeletePromos(id)
 
 	if rows, _ := res.RowsAffected(); rows == 0 {
-		ctx.JSON(http.StatusNotFound, helpers.GetResponse("id promo not found", nil))
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("id promo not found", nil, nil))
 		return
 	}
 
@@ -170,5 +166,5 @@ func (h *HandlerPromos) DeletePromos(ctx *gin.Context) {
 		fmt.Println(err)
 		return
 	}
-	ctx.JSON(http.StatusOK, helpers.GetResponse("delete promo success", nil))
+	ctx.JSON(http.StatusOK, helpers.GetResponse("delete promo success", nil, nil))
 }

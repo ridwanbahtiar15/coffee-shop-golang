@@ -9,6 +9,10 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+type IProductsRepository interface {
+	GetAllProduct(page string, limit string) ([]models.ProductsResponseModel, error)
+}
+
 type ProductsRepository struct {
 	*sqlx.DB
 }

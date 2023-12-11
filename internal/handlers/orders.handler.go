@@ -37,7 +37,7 @@ func (h *HandlerOrders) GetAllOrders(ctx *gin.Context) {
 		}
 
 		if len(result) == 0 {
-			ctx.JSON(http.StatusNotFound, helpers.GetResponse("user not found", nil))
+			ctx.JSON(http.StatusNotFound, helpers.GetResponse("user not found", nil, nil))
 			return
 		}
 
@@ -80,16 +80,12 @@ func (h *HandlerOrders) GetAllOrders(ctx *gin.Context) {
 			isPrev = linkPrev
 		}
 
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": "get order success",
-			"result": result,
-			"meta": gin.H{
-				"page": resultPage,
-				"totalData": totalData,
-				"next": isNext,
-				"prev": isPrev,
-			},
-		})
+		ctx.JSON(http.StatusOK, helpers.GetResponse("get order success", result, gin.H{
+			"page": resultPage,
+			"totalData": totalData,
+			"next": isNext,
+			"prev": isPrev,
+		}))
 		return
 	}
 
@@ -102,11 +98,11 @@ func (h *HandlerOrders) GetAllOrders(ctx *gin.Context) {
 	}
 
 	if len(result) == 0 {
-		ctx.JSON(http.StatusNotFound, helpers.GetResponse("order not found", nil))
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("order not found", nil, nil))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, helpers.GetResponse("get all order success", result))
+	ctx.JSON(http.StatusOK, helpers.GetResponse("get all order success", result, nil))
 }
 
 func (h *HandlerOrders) CreateOrders(ctx *gin.Context) {
@@ -121,7 +117,7 @@ func (h *HandlerOrders) CreateOrders(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, helpers.GetResponse("create order success", nil))
+	ctx.JSON(http.StatusOK, helpers.GetResponse("create order success", nil, nil))
 }
 
 func (h *HandlerOrders) UpdateOrders(ctx *gin.Context) {
@@ -142,5 +138,5 @@ func (h *HandlerOrders) UpdateOrders(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, helpers.GetResponse("update order success", nil))
+	ctx.JSON(http.StatusOK, helpers.GetResponse("update order success", nil, nil))
 }

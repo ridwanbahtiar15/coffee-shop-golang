@@ -9,7 +9,7 @@ services:
     #environtment
     # - GI_MODE=release
     # - DB_HOST=host.docker.internal
-    # - GO_ENV=DOCKER
+    # - GO_ENV=DOCKERc
     networks:
       - net1
 

@@ -24,9 +24,9 @@ func (h *HandlerPaymentmethods) GetAllPaymentmethods(ctx *gin.Context) {
 	}
 
 	if len(result) == 0 {
-		ctx.JSON(http.StatusNotFound, helpers.GetResponse("payment method not found", nil))
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("payment method not found", nil, nil))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, helpers.GetResponse("get all payment method success", nil))
+	ctx.JSON(http.StatusOK, helpers.GetResponse("get all payment method success", nil, nil))
 }

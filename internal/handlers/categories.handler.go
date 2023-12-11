@@ -24,8 +24,8 @@ func (h *HandlerCategories) GetAllCategories(ctx *gin.Context) {
 	}
 
 	if len(result) == 0 {
-		ctx.JSON(http.StatusNotFound, helpers.GetResponse("category not found", nil))
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("category not found", nil, nil))
 		return
 	}
-	ctx.JSON(http.StatusOK, helpers.GetResponse("get all category success", result))
+	ctx.JSON(http.StatusOK, helpers.GetResponse("get all category success", result, nil))
 }

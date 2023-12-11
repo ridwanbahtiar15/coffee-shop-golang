@@ -24,9 +24,9 @@ func (h *HandlerRoles) GetAllRoles(ctx *gin.Context) {
 	}
 
 	if len(result) == 0 {
-		ctx.JSON(http.StatusNotFound, helpers.GetResponse("role not found", nil))
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("role not found", nil, nil))
 		return
 	}
 	
-	ctx.JSON(http.StatusOK, helpers.GetResponse("get all role success", result))
+	ctx.JSON(http.StatusOK, helpers.GetResponse("get all role success", result, nil))
 }
