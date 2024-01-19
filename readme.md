@@ -1,43 +1,125 @@
-# Coffee Shop Golang
+# Coffe Shop With Golang
 
-A project coffe shop, build with using Golang, Gingonic and PostgreSQL
+<!-- ABOUT THE PROJECT -->
 
----
+## About The Project
 
-## Requirements
+A web api project for ordering coffee and transactions online. There are 4 operations that can be performed, Get (fetching data), Post (insert data), Update (update partial data), delete (delete data)
 
-For development, you will only Golang, PostgreSQL and global package like Gingonic, Json Web Token, argon2, dotenv installed in your environement.
+## Built With
 
-### Golang
+- [![Golang][Golang-logo]][Golang-url]
+- [![PostgreSql][PostgreSql-logo]][PostgreSql-url]
 
-- #### Golang installation on Windows
+### Package
 
-  Just go on [official Golang website](https://go.dev/doc/install) and download the installer.
+- [![GinGonic][GinGonic-logo]][GinGonic-url]
+- [![JsonWebToken][JsonWebToken-logo]][JsonWebToken-url]
+- [![GoValidator][GoValidator-logo]][GoValidator-url]
+- [![Cloudinary][Cloudinary-logo]][Cloudinary-url]
+- [![Pq][Pq-logo]][Pq-url]
+- [![DotEnv][DotEnv-logo]][DotEnv-url]
 
-If the installation was successful, you should be able to run the following command.
+## Install And Run Locally
 
-    go version
+Clone project from github repository
 
-###
+    git clone https://github.com/ridwanbahtiar15/coffee-shop-golang.git
 
-## Install
+go to folder coffee-shop
 
-    git clone https://github.com/ridwanbahtiar15/coffe-shop
-    cd PROJECT_TITLE
-    go mod init
+    cd coffee-shop-golang
+
+install dependencies
+
+    go get -d ./...
+
+Start the server
+
+    go run ./cmd/main.go
 
 ## Configure app
 
-Create file `.env` then edit it with your settings. You will need:
+Create file `.env` then edit it with your settings
+according to your needs. You will need:
 
-- DB_HOST = "localhost"
-- DB_NAME = "coffeeshop"
-- DB_USER = "Your PostgreSQL Usrename"
-- DB_PASS = "Your PostgreSQL Password"
+| Key               | Value                  |
+| ----------------- | ---------------------- |
+| DB_HOST           | Your Database Host     |
+| DB_NAME           | Your Database Host     |
+| DB_USER           | Your Database User     |
+| DB_PASSWORD       | Your Database Password |
+| DB_SSLMODE        | disable                |
+| JWT_SECRET        | Your JWT Secret        |
+| JWT_ISSUER        | Your Issuer            |
+| CLOUDINERY_NAME   | Your Cloudinary Name   |
+| CLOUDINERY_KEY    | Your Cloudinary Key    |
+| CLOUDINERY_SECRET | Your Cloudinary Secret |
 
-- JWT_KEY = "SECRET"
-- ISSUER = "Your Issuer, Up to you"
+## Api Refrences
 
-## Running the project
+Auth
+| Route | Method | Description |
+| -------------- | ----------------------- | ------ |
+| /auth/login | POST | Login user |
+| /auth/register | POST | Register user |
+| /auth/logout | DELETE | Logout user |
 
-    $ go run ./cmd/main.go
+Product
+| Route | Method | Method |
+| -------------- | ----------------------- | ------ |
+| /products | GET | Get all product |
+| /products/:name | GET | Get product by name |
+| /products/:category | GET | Get product by category |
+| /products | POST | Create new product |
+| /products/:id | PATCH | Update Product |
+| /products/:id | DELETE | Delete Product |
+
+Order
+| Route | Method | Description |
+| -------------- | ----------------------- | ------ |
+| /orders | GET | Get all order |
+| /orders | POST | Create new order |
+| /orders/:id | GET | Get Order by id |
+| /orders/:id | PATCH | Update status order |
+
+User
+| Route | Method | Description |
+| -------------- | ----------------------- | ------ |
+| /users | GET | Get all user |
+| /users | POST | Create new user |
+| /users/:id | GET | Get user by id |
+| /users/:id | PATCH | Update user by id |
+| /users/:id | DELETE | Delete user by id |
+| /users/profile | GET | Get user profile |
+| /users/profile/edit | PATCH | Update user profile |
+
+## Documentation
+
+[Postman Documentation](https://documenter.getpostman.com/view/28541505/2s9YsT4npX)
+
+## Related Project
+
+[Front End With React JS](https://github.com/ridwanbahtiar15/coffee-shop-react-vite.git)
+[Back End With Express JS](https://github.com/ridwanbahtiar15/coffe-shop.git)
+
+## Credit
+
+[Ridwan Bahtiar](https://github.com/ridwanbahtiar15)
+
+<!-- MARKDOWN LINKS & IMAGES -->
+
+[Golang-url]: https://go.dev/
+[Golang-logo]: https://img.shields.io/badge/Golang-blue
+[Gingonic-url]: https://gin-gonic.com/
+[Gingonic-logo]: https://img.shields.io/badge/Gin%20Gonic-lightskyblue
+[PostgreSql-url]: https://www.postgresql.org/
+[PostgreSql-logo]: https://img.shields.io/badge/Postgre%20SQL-blue
+[GoValidator-url]: https://github.com/asaskevich/govalidator
+[GoValidator-logo]: https://img.shields.io/badge/Go%20Validator-red
+[Cloudinary-url]: https://github.com/cloudinary/cloudinary-go
+[Cloudinary-logo]: https://img.shields.io/badge/Cloudinay-green
+[Pq-url]: https://github.com/lib/pq
+[Pq-logo]: https://img.shields.io/badge/pq-grey
+[DotEnv-url]: https://github.com/joho/godotenv
+[DotEnv-logo]: https://img.shields.io/badge/godotenv-black
