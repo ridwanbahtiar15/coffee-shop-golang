@@ -14,7 +14,6 @@ A web api project for ordering coffee and transactions online. There are 4 opera
 ### Package
 
 - [![GinGonic][GinGonic-logo]][GinGonic-url]
-- [![JsonWebToken][JsonWebToken-logo]][JsonWebToken-url]
 - [![GoValidator][GoValidator-logo]][GoValidator-url]
 - [![Cloudinary][Cloudinary-logo]][Cloudinary-url]
 - [![Pq][Pq-logo]][Pq-url]
