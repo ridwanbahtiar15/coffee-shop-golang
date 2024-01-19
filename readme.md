@@ -23,19 +23,19 @@ A web api project for ordering coffee and transactions online. There are 4 opera
 
 Clone project from github repository
 
-    git clone https://github.com/ridwanbahtiar15/coffee-shop-golang.git
+    $ git clone https://github.com/ridwanbahtiar15/coffee-shop-golang.git
 
 go to folder coffee-shop
 
-    cd coffee-shop-golang
+    $ cd coffee-shop-golang
 
 install dependencies
 
-    go get -d ./...
+    $ go get -d ./...
 
 Start the server
 
-    go run ./cmd/main.go
+    $ go run ./cmd/main.go
 
 ## Configure app
 
