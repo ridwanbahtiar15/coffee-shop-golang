@@ -17,21 +17,29 @@ import (
 )
 
 type HandlerUsers struct {
-	*repositories.UsersRepository
+	repositories.IUsersRepository
 }
 
-func InitializeHandlerUsers(r *repositories.UsersRepository) *HandlerUsers {
+func InitializeHandlerUsers(r repositories.IUsersRepository) *HandlerUsers {
 	return &HandlerUsers{r}
 }
 
 func (h *HandlerUsers) GetAllUsers(ctx *gin.Context) {
-	name, returnName := ctx.GetQuery("name")
-	page, returnPage := ctx.GetQuery("page")
-	limit, returnLimit := ctx.GetQuery("limit")
+	name, _ := ctx.GetQuery("name")
+	page, _ := ctx.GetQuery("page")
+	limit, _ := ctx.GetQuery("limit")
 	sort, returnSort := ctx.GetQuery("sort")
 	
-	if returnName || returnPage || returnLimit || returnSort {
-		result, err := h.RepositoryGetFilterUsers(name, page, limit, sort)
+	// if returnName || returnPage || returnLimit || returnSort {
+
+		if page == "" {
+			page = "1"
+		}
+
+		if limit == "" {
+			limit = "6"
+		}
+		result, err := h.RepositoryGetAllUsers(name, page, limit, sort)
 
 		if len(result) == 0 {
 			ctx.JSON(http.StatusNotFound, helpers.GetResponse("user not found", nil, nil))
@@ -80,22 +88,18 @@ func (h *HandlerUsers) GetAllUsers(ctx *gin.Context) {
 			isPrev = linkPrev
 		}
 
-		ctx.JSON(http.StatusOK, helpers.GetResponse("get user success", result, gin.H{
-			"page": resultPage,
-			"totalData": totalData,
-			"next": isNext,
-			"prev": isPrev,
-		}))
-		return
-	}
+		meta := helpers.GetPagination(resultPage, totalData, isNext, isPrev)
+		ctx.JSON(http.StatusOK, helpers.GetResponse("get user success", result, &meta))
+
+	// }
 	
 
-	result, err := h.RepositoryGetAllUsers()
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
-		return
-	}
-	ctx.JSON(http.StatusOK, helpers.GetResponse("get all user success", result, nil))
+	// result, err := h.RepositoryGetAllUsers()
+	// if err != nil {
+	// 	ctx.JSON(http.StatusInternalServerError, err)
+	// 	return
+	// }
+	// ctx.JSON(http.StatusOK, helpers.GetResponse("get all user success", result, nil))
 }
 
 func (h *HandlerUsers) GetUsersById(ctx *gin.Context) {
@@ -103,6 +107,11 @@ func (h *HandlerUsers) GetUsersById(ctx *gin.Context) {
 	result, err := h.RepositoryUsersById(id)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	if len(result) == 0 {
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("user not found", nil, nil))
 		return
 	}
 	ctx.JSON(http.StatusOK, helpers.GetResponse("get user by id success", result, nil))
@@ -298,13 +307,13 @@ func (h *HandlerUsers) DeleteUsers(ctx *gin.Context) {
 	id := ctx.Param("id")
 	res, err := h.RepositoryDeleteUsers(id)
 
-	if rows, _ := res.RowsAffected(); rows == 0 {
-		ctx.JSON(http.StatusNotFound, helpers.GetResponse("id user not found", nil, nil))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
 
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
+	if res == 0 {
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("id user not found", nil, nil))
 		return
 	}
 	ctx.JSON(http.StatusOK, helpers.GetResponse("delete user success", nil, nil))

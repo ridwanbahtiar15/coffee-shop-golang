@@ -2,11 +2,19 @@ package repositories
 
 import (
 	"coffee-shop-golang/internal/models"
-	"database/sql"
 	"strconv"
 
 	"github.com/jmoiron/sqlx"
 )
+
+type IPromosRepository interface {
+	RepsitoryGetAllPromos(page string, limit string) ([]models.PromosModel, error)
+	RepositoryGetPromosById(id string) ([]models.PromosModel, error)
+	RepsitoryCreatePromos(body *models.PromosModel) (error)
+	RepsitoryUpdatePromos(body *models.UpdatePromosModel, id string) (error)
+	RepositoryDeletePromos(id string) (int64, error)
+	RepositoryCountPromos() ([]string, error)
+}
 
 type PromosRepository struct {
 	*sqlx.DB
@@ -17,14 +25,33 @@ func InitializeRepoPromos(db *sqlx.DB) *PromosRepository {
 	return &dr
 }
 
-func (r *PromosRepository) RepsitoryGetAllPromos() ([]models.PromosModel, error) {
-	result := []models.PromosModel{}
-	query := `SELECT * FROM promos`
-	err := r.Select(&result, query)
-	if err != nil {
-		return nil, err
+func (r *PromosRepository) RepsitoryGetAllPromos(page string, limit string) ([]models.PromosModel, error) {
+	// result := []models.PromosModel{}
+	// query := `SELECT * FROM promos`
+	// err := r.Select(&result, query)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// return result, nil
+
+	newPage, _ := strconv.Atoi("1")
+	newLimit, _ := strconv.Atoi("99")
+
+	if page != "" {
+		newPage, _ = strconv.Atoi(page) 
 	}
-	return result, nil
+	if limit != "" {
+		newLimit, _ = strconv.Atoi(limit) 
+	}
+
+	result := []models.PromosModel{}
+	query := `SELECT * FROM promos WHERE promos_id != '0' LIMIT $1 OFFSET $2`
+	offset := newPage * newLimit - newLimit;
+		err := r.Select(&result, query, newLimit, strconv.Itoa(offset))
+		if err != nil {
+			return nil, err
+		}
+		return result, nil
 }
 
 func (r *PromosRepository) RepositoryGetPromosById(id string) ([]models.PromosModel, error) {
@@ -55,13 +82,19 @@ func (r *PromosRepository) RepsitoryUpdatePromos(body *models.UpdatePromosModel,
 	return nil
 }
 
-func (r *PromosRepository) RepositoryDeletePromos(id string) (sql.Result, error) {
+func (r *PromosRepository) RepositoryDeletePromos(id string) (int64, error) {
+	var res int64 = 1
 	query := `DELETE FROM promos WHERE promos_id = $1`
 	result, err := r.Exec(query, id)
 	if err != nil {
-		return nil, err 
+		return 0, err 
 	}
-	return result, nil
+	
+	if rows, _ := result.RowsAffected(); rows == 0 {
+		res = 0
+		return res, nil
+	}
+	return res, nil
 }
 
 func (r *PromosRepository) RepositoryGetFilterPromos(page string, limit string) ([]models.PromosModel, error) {

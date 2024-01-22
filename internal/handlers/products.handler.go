@@ -15,25 +15,25 @@ import (
 )
 
 type HandlerProducts struct {
-	*repositories.ProductsRepository
+	repositories.IProductsRepository
 }
 
 
-func InitializeHandlerProducts(r *repositories.ProductsRepository) *HandlerProducts {
+func InitializeHandlerProducts(r repositories.IProductsRepository) *HandlerProducts {
 	return &HandlerProducts{r}
 }
 
 
 func (h *HandlerProducts) GetAllProducts(ctx *gin.Context) {
-	name, returnName := ctx.GetQuery("name")
-	category, returnCategory := ctx.GetQuery("category")
+	name, _ := ctx.GetQuery("name")
+	category, _ := ctx.GetQuery("category")
 	minrange, returnMinrange := ctx.GetQuery("minrange")
 	maxrange, returnMaxrange := ctx.GetQuery("maxrange")
-	page, returnPage := ctx.GetQuery("page")
-	limit, returnLimit := ctx.GetQuery("limit")
-	sort, returnSort := ctx.GetQuery("sort")
+	page, _ := ctx.GetQuery("page")
+	limit, _ := ctx.GetQuery("limit")
+	sort, _ := ctx.GetQuery("sort")
 
-	if returnName || returnCategory || returnMinrange || returnMaxrange || returnPage || returnLimit || returnSort {
+	// if returnName || returnCategory || returnMinrange || returnMaxrange || returnPage || returnLimit || returnSort {
 		
 		if returnMinrange && returnMaxrange {
 			if minrange >= maxrange {
@@ -42,7 +42,15 @@ func (h *HandlerProducts) GetAllProducts(ctx *gin.Context) {
 			}
 		}
 
-		result, err := h.RepsitoryGetFilterProducts(name, category, minrange, maxrange, page, limit, sort)
+		if page == "" {
+			page = "1"
+		}
+
+		if limit == "" {
+			limit = "6"
+		}
+
+		result, err := h.RepositoryGetAllProducts(name, category, minrange, maxrange, page, limit, sort)
 
 		if len(result) == 0 {
 			ctx.JSON(http.StatusNotFound, helpers.GetResponse("product not found", nil, nil))
@@ -57,46 +65,45 @@ func (h *HandlerProducts) GetAllProducts(ctx *gin.Context) {
 		count, _ := h.RepositoryCountProducts(name, category, minrange, maxrange)
 
 		totalData, _ := strconv.Atoi(count[0])
+		fmt.Println(totalData)
 		resultLimit, _ := strconv.Atoi(limit)
 		resultPage, _ := strconv.Atoi(page)
 		isLastPage := math.Ceil(float64(totalData) / float64(resultLimit))
 		resultIsLastPage := int(isLastPage) <= resultPage
 		
 		linkNext := fmt.Sprintf("%s?page=%d&limit=%d", ctx.Request.URL.Path, resultPage + 1, resultLimit) 
-		if returnName {
+		if name != "" {
 			linkNext = fmt.Sprintf("%s&name=%s", linkNext, name)
 		}
-		if returnCategory {
+		if category != "" {
 			linkNext = fmt.Sprintf("%s&category=%s", linkNext, category)
 		}
 		if returnMinrange && returnMaxrange {
 			linkNext = fmt.Sprintf("%s&minrange=%s&maxrange=%s", linkNext, minrange, maxrange)
 		}
-		if returnSort {
+		if sort != "" {
 			linkNext = fmt.Sprintf("%s&sort=%s", linkNext, sort)
 		}
 
 		linkPrev := fmt.Sprintf("%s?page=%d&limit=%d", ctx.Request.URL.Path, resultPage - 1, resultLimit)
-		if returnName {
+		if name != "" {
 			linkPrev = fmt.Sprintf("%s&name=%s", linkPrev, name)
 		}
-		if returnCategory {
+		if category != "" {
 			linkPrev = fmt.Sprintf("%s&category=%s", linkPrev, category)
 		}
 		if returnMinrange && returnMaxrange {
 			linkPrev = fmt.Sprintf("%s&minrange=%s&maxrange=%s", linkPrev, minrange, maxrange)
 		}
-		if returnSort {
+		if sort != "" {
 			linkPrev = fmt.Sprintf("%s&sort=%s", linkPrev, sort)
 		}
 
-		var isNext string
-		var isPrev string
+		isNext := linkNext
+		isPrev := linkPrev
 
 		if resultIsLastPage {
 			isNext = "null"
-		} else {
-			isNext = linkNext
 		}
 
 		if resultPage == 1 || resultPage == 0 {
@@ -105,26 +112,27 @@ func (h *HandlerProducts) GetAllProducts(ctx *gin.Context) {
 			isPrev = linkPrev
 		}
 
-		ctx.JSON(http.StatusOK, helpers.GetResponse("get product success", result, gin.H{
-			"page": resultPage,
-			"totalData": totalData,
-			"next": isNext,
-			"prev": isPrev,
-		}))
-		return
+		
+
+		meta := helpers.GetPagination(resultPage, totalData, isNext, isPrev)
+		ctx.JSON(http.StatusOK, helpers.GetResponse("get product success", result, &meta))
 	}
 
-	result, err := h.RepositoryGetAllProducts()
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
-		return
-	}
-	ctx.JSON(http.StatusOK, helpers.GetResponse("get all product success", result, nil))
-}
+	// result, err := h.RepositoryGetAllProducts(name, category, minrange, maxrange, page, limit, sort)
+	// if err != nil {
+	// 	ctx.JSON(http.StatusInternalServerError, err)
+	// 	return
+	// }
+	// ctx.JSON(http.StatusOK, helpers.GetResponse("get all product success", result, nil))
+// }
 
 func (h *HandlerProducts) GetProductsById(ctx *gin.Context) {
 	id := ctx.Param("id")
 	result, err := h.RepositoryProductsById(id)
+	if len(result) == 0 {
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("product not found", nil, nil))
+		return
+	}
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
@@ -170,7 +178,7 @@ func (h *HandlerProducts) CreateProducts(ctx *gin.Context) {
 	}
 	defer file.Close()
 	
-	publicId := fmt.Sprintf("%s_%s-%s", "product", fieldName, strconv.Itoa(id))
+	publicId := fmt.Sprintf("%s_%s-%s", "product", fieldName, strconv.Itoa(id[0]))
 	folder := ""
 	res, errs := cld.Uploader(ctx, file, publicId, folder)
 
@@ -179,7 +187,7 @@ func (h *HandlerProducts) CreateProducts(ctx *gin.Context) {
 		return
 	}
 
-	errUpdate := h.RepositoryUpdateImgProducts(res.SecureURL, strconv.Itoa(id))
+	errUpdate := h.RepositoryUpdateImgProducts(res.SecureURL, strconv.Itoa(id[0]))
 	if errUpdate != nil {
 		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(errUpdate.Error(), nil, nil))
 		return
@@ -284,11 +292,6 @@ func (h *HandlerProducts) DeleteProducts(ctx *gin.Context) {
 	id := ctx.Param("id")
 	res, err := h.RepositoryDeleteProducts(id)
 
-	if rows, _ := res.RowsAffected(); rows == 0 {
-		ctx.JSON(http.StatusNotFound, helpers.GetResponse("id product not found", nil, nil))
-		return
-	}
-
 	if err != nil {
 		pgErr, _ := err.(*pq.Error)
 		if pgErr.Code == "23503" {
@@ -296,6 +299,11 @@ func (h *HandlerProducts) DeleteProducts(ctx *gin.Context) {
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+
+	if rows := res; rows == 0 {
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("id product not found", nil, nil))
 		return
 	}
 	ctx.JSON(http.StatusOK, helpers.GetResponse("delete product success", nil, nil))

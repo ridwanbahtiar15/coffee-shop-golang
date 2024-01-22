@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var pwd = "12345"
+var pwd = "123456"
 var hashed string
 var hc = InitHashConfig().UseDefaultConfig()
 
@@ -16,6 +16,7 @@ func TestGenHashedPassword(t *testing.T) {
 	assert.NotEqual(t, pwd, hp, "Failed hash password")
 	hashed = hp
 }
+
 
 func TestComparePasswordAndHash(t *testing.T) {
 	t.Run("Case password valid", func(t *testing.T) {

@@ -14,20 +14,20 @@ import (
 )
 
 type HandlerPromos struct {
-	*repositories.PromosRepository
+	repositories.IPromosRepository
 }
 
-func InitializeHandlerPromos(r *repositories.PromosRepository) *HandlerPromos {
+func InitializeHandlerPromos(r repositories.IPromosRepository) *HandlerPromos {
 	return &HandlerPromos{r}
 }
 
 func (h *HandlerPromos) GetAllPromos(ctx *gin.Context) {
-	page, returnPage := ctx.GetQuery("page")
-	limit, returnLimit := ctx.GetQuery("limit")
+	// var body *models.QueryParamsPromo
+	page, _ := ctx.GetQuery("page")
+	limit, _ := ctx.GetQuery("limit")
 
-	if returnPage || returnLimit {
-		result, err := h.RepositoryGetFilterPromos(page, limit)
-		fmt.Println(err)
+	// if returnPage || returnLimit {
+		result, err := h.RepsitoryGetAllPromos(page, limit)
 
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, err)
@@ -70,28 +70,24 @@ func (h *HandlerPromos) GetAllPromos(ctx *gin.Context) {
 			isPrev = linkPrev
 		}
 
-		ctx.JSON(http.StatusOK, helpers.GetResponse("get promo success", result, gin.H{
-			"page": resultPage,
-			"totalData": totalData,
-			"next": isNext,
-			"prev": isPrev,
-		}))
+		meta := helpers.GetPagination(resultPage, totalData, isNext, isPrev)
+		ctx.JSON(http.StatusOK, helpers.GetResponse("get promo success", result, &meta))
 		return
-	}
+	// }
 
 	
-	result, err := h.RepsitoryGetAllPromos()
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
-		return
-	}
+	// result, err := h.RepsitoryGetAllPromos()
+	// if err != nil {
+	// 	ctx.JSON(http.StatusInternalServerError, err)
+	// 	return
+	// }
 
-	if len(result) == 0 {
-		ctx.JSON(http.StatusNotFound, helpers.GetResponse("promo not found", nil, nil))
-		return
-	}
+	// if len(result) == 0 {
+	// 	ctx.JSON(http.StatusNotFound, helpers.GetResponse("promo not found", nil, nil))
+	// 	return
+	// }
 
-	ctx.JSON(http.StatusOK, helpers.GetResponse("get all promo success", result, nil))
+	// ctx.JSON(http.StatusOK, helpers.GetResponse("get all promo success", result, nil))
 }
 
 func (h *HandlerPromos) CreateProomos(ctx *gin.Context) {
@@ -156,15 +152,29 @@ func (h *HandlerPromos) DeletePromos(ctx *gin.Context) {
 	id := ctx.Param("id")
 	res, err := h.RepositoryDeletePromos(id)
 
-	if rows, _ := res.RowsAffected(); rows == 0 {
-		ctx.JSON(http.StatusNotFound, helpers.GetResponse("id promo not found", nil, nil))
-		return
-	}
-
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		fmt.Println(err)
 		return
 	}
+	
+	if rows := res; rows == 0 {
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("id promo not found", nil, nil))
+		return
+	}
 	ctx.JSON(http.StatusOK, helpers.GetResponse("delete promo success", nil, nil))
+}
+
+func (h *HandlerPromos) GetPromosById(ctx *gin.Context) {
+	id := ctx.Param("id")
+	result, err := h.RepositoryGetPromosById(id)
+	if len(result) == 0 {
+		ctx.JSON(http.StatusNotFound, helpers.GetResponse("promo not found", nil, nil))
+		return
+	}
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, helpers.GetResponse("get promo by id success", result, nil))
 }

@@ -15,14 +15,14 @@ type ProductsModel struct {
 }
 
 type ProductsResponseModel struct {
-	Products_id        string     `db:"products_id"`
-	Products_name      string     `db:"products_name"`
-	Products_price     string     `db:"products_price"`
-	Products_desc      string     `db:"products_desc"`
-	Products_stock     string     `db:"products_stock"`
-	Products_image     string     `db:"products_image"`
-	Categories_id      string     `db:"categories_id"`
-	Categories_name 	 string 		`db:"categories_name"`
+	Products_id        string     `db:"products_id" json:"products_id"`
+	Products_name      string     `db:"products_name" json:"products_name"`
+	Products_price     string     `db:"products_price" json:"products_price"`
+	Products_desc      string     `db:"products_desc" json:"products_desc"`
+	Products_stock     string     `db:"products_stock" json:"products_stock"`
+	Products_image     string     `db:"products_image" json:"products_image"`
+	Categories_id      string     `db:"categories_id" json:"categories_id"`
+	Categories_name 	 string 		`db:"categories_name" json:"categories_name"`
 }
 
 type UpdateProductsModel struct {

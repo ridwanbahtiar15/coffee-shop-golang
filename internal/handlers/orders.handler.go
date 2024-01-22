@@ -80,12 +80,8 @@ func (h *HandlerOrders) GetAllOrders(ctx *gin.Context) {
 			isPrev = linkPrev
 		}
 
-		ctx.JSON(http.StatusOK, helpers.GetResponse("get order success", result, gin.H{
-			"page": resultPage,
-			"totalData": totalData,
-			"next": isNext,
-			"prev": isPrev,
-		}))
+		meta := helpers.GetPagination(resultPage, totalData, isNext, isPrev)
+		ctx.JSON(http.StatusOK, helpers.GetResponse("get order success", result, &meta))
 		return
 	}
 

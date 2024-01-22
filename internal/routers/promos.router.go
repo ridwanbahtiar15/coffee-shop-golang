@@ -16,6 +16,7 @@ func RouterPromos(g *gin.Engine, db *sqlx.DB) {
 	repositoryAuth := repositories.InitializeRepoAuth(db)
 
 	route.GET("/", middlewares.JWTGate([]string{"1", "2"}, repositoryAuth), handler.GetAllPromos)
+	route.GET("/:id", middlewares.JWTGate([]string{"1", "2"}, repositoryAuth), handler.GetPromosById)
 	route.POST("/", middlewares.JWTGate([]string{"1"}, repositoryAuth), handler.CreateProomos)
 	route.PATCH("/:id", middlewares.JWTGate([]string{"1"}, repositoryAuth), handler.UpdatePromos)
 	route.DELETE("/:id", middlewares.JWTGate([]string{"1"}, repositoryAuth), handler.DeletePromos)
