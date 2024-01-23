@@ -29,19 +29,19 @@ func (arm *PromoRepositoryMock) RepositoryGetPromosById(id string) ([]models.Pro
 }
 
 // RepsitoryCreatePromos implements IPromosRepository.
-func (arm *PromoRepositoryMock) RepsitoryCreatePromos(body *models.PromosModel) error {
+func (arm *PromoRepositoryMock) RepositoryCreatePromos(body *models.PromosModel) error {
 	args := arm.Mock.Called(body)
 	return args.Error(0)
 }
 
 // RepsitoryGetAllPromos implements IPromosRepository.
-func (arm *PromoRepositoryMock) RepsitoryGetAllPromos(page string, limit string) ([]models.PromosModel, error) {
+func (arm *PromoRepositoryMock) RepositoryGetAllPromos(page string, limit string) ([]models.PromosModel, error) {
 	args := arm.Mock.Called(page, limit)
 	return args.Get(0).([]models.PromosModel), args.Error(1)
 }
 
 // RepsitoryUpdatePromos implements IPromosRepository.
-func (arm *PromoRepositoryMock) RepsitoryUpdatePromos(body *models.UpdatePromosModel, id string) error {
+func (arm *PromoRepositoryMock) RepositoryUpdatePromos(body *models.UpdatePromosModel, id string) error {
 	args := arm.Mock.Called(body, id)
 	return args.Error(0)
 }

@@ -9,6 +9,14 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+type IOrderRepository interface {
+	RepositoryGetAllOrders(orderNumber string, page string, limit string, sort string) ([]models.OrdersResponseModel, error)
+	RepositoryGetOrdersById(id string) ([]models.OrdersResponseModel, error)
+	RepositoryCreateOrders(body *models.OrdersModel) (error)
+	RepositoryCountOrders(orderNumber string) ([]string, error)
+	RepositoryUpdateOrders(body *models.OrderUpdateModel, id string) (error)
+}
+
 type OrdersRepository struct {
 	*sqlx.DB
 }
@@ -18,13 +26,76 @@ func InitializeRepoOrders(db *sqlx.DB) *OrdersRepository {
 	return &cr
 }
 
-func (r *OrdersRepository) RepositoryGetAllOrders() ([]models.OrdersResponseModel, error) {
+// func (r *OrdersRepository) RepositoryGetAllOrders() ([]models.OrdersResponseModel, error) {
+// 	result := []models.OrdersResponseModel{}
+// 	query := `SELECT o.orders_id, o.users_id, o.deliveries_id, p.promos_name, 
+// 						o.payment_methods_id, o.orders_status, o.orders_total
+// 	 					FROM orders o
+// 						JOIN promos p ON o.promos_id = p.promos_id`
+// 	err := r.Select(&result, query)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return result, nil
+// }
+
+func (r *OrdersRepository) RepositoryGetAllOrders(orderNumber string, page string, limit string, sort string) ([]models.OrdersResponseModel, error) {
+	newPage, _ := strconv.Atoi("1")
+	newLimit, _ := strconv.Atoi("99")
+
+	if page != "" {
+		newPage, _ = strconv.Atoi(page) 
+	}
+	if limit != "" {
+		newLimit, _ = strconv.Atoi(limit) 
+	}
+
 	result := []models.OrdersResponseModel{}
 	query := `SELECT o.orders_id, o.users_id, o.deliveries_id, p.promos_name, 
 						o.payment_methods_id, o.orders_status, o.orders_total
 	 					FROM orders o
 						JOIN promos p ON o.promos_id = p.promos_id`
-	err := r.Select(&result, query)
+	if orderNumber != "" {
+		query += ` WHERE o.orders_id = $1`
+		switch sort {
+		case "asc":
+			query += ` ORDER BY o.orders_id ASC LIMIT $2 OFFSET $3`
+		case "desc":
+			query += ` ORDER BY o.orders_id DESC LIMIT $2 OFFSET $3`
+		default:
+			query += ` ORDER BY o.orders_id ASC LIMIT $2 OFFSET $3`
+		}
+		offset := newPage * newLimit - newLimit;
+		err := r.Select(&result, query, orderNumber, newLimit, strconv.Itoa(offset))
+		if err != nil {
+			return nil, err
+		}
+		return result, nil
+	}
+
+	switch sort {
+	case "asc":
+		query += ` ORDER BY o.orders_id ASC LIMIT $1 OFFSET $2`
+	case "desc":
+		query += ` ORDER BY o.orders_id DESC LIMIT $1 OFFSET $2`
+	default:
+		query += ` ORDER BY o.orders_id ASC LIMIT $1 OFFSET $2`
+	}
+	offset := newPage * newLimit - newLimit;
+	err := r.Select(&result, query, newLimit, strconv.Itoa(offset))
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (r *OrdersRepository) RepositoryGetOrdersById(id string) ([]models.OrdersResponseModel, error) {
+	result := []models.OrdersResponseModel{}
+	query := `SELECT o.orders_id, o.users_id, o.deliveries_id, p.promos_name, 
+						o.payment_methods_id, o.orders_status, o.orders_total
+						FROM orders o
+						JOIN promos p ON o.promos_id = p.promos_id WHERE orders_id = $1`
+	err := r.Select(&result, query, id)
 	if err != nil {
 		return nil, err
 	}
@@ -76,55 +147,55 @@ func (r *OrdersRepository) RepositoryCreateOrders(body *models.OrdersModel) (err
 	return nil
 }
 
-func (r *OrdersRepository) RepositoryGetFilterOrders(orderNumber string, page string, limit string, sort string) ([]models.OrdersResponseModel, error) {
-	newPage, _ := strconv.Atoi("1")
-	newLimit, _ := strconv.Atoi("99")
+// func (r *OrdersRepository) RepositoryGetFilterOrders(orderNumber string, page string, limit string, sort string) ([]models.OrdersResponseModel, error) {
+// 	newPage, _ := strconv.Atoi("1")
+// 	newLimit, _ := strconv.Atoi("99")
 
-	if page != "" {
-		newPage, _ = strconv.Atoi(page) 
-	}
-	if limit != "" {
-		newLimit, _ = strconv.Atoi(limit) 
-	}
+// 	if page != "" {
+// 		newPage, _ = strconv.Atoi(page) 
+// 	}
+// 	if limit != "" {
+// 		newLimit, _ = strconv.Atoi(limit) 
+// 	}
 
-	result := []models.OrdersResponseModel{}
-	query := `SELECT o.orders_id, o.users_id, o.deliveries_id, p.promos_name, 
-						o.payment_methods_id, o.orders_status, o.orders_total
-	 					FROM orders o
-						JOIN promos p ON o.promos_id = p.promos_id`
-	if orderNumber != "" {
-		query += ` WHERE o.orders_id = $1`
-		switch sort {
-		case "asc":
-			query += ` ORDER BY o.orders_id ASC LIMIT $2 OFFSET $3`
-		case "desc":
-			query += ` ORDER BY o.orders_id DESC LIMIT $2 OFFSET $3`
-		default:
-			query += ` ORDER BY o.orders_id ASC LIMIT $2 OFFSET $3`
-		}
-		offset := newPage * newLimit - newLimit;
-		err := r.Select(&result, query, orderNumber, newLimit, strconv.Itoa(offset))
-		if err != nil {
-			return nil, err
-		}
-		return result, nil
-	}
+// 	result := []models.OrdersResponseModel{}
+// 	query := `SELECT o.orders_id, o.users_id, o.deliveries_id, p.promos_name, 
+// 						o.payment_methods_id, o.orders_status, o.orders_total
+// 	 					FROM orders o
+// 						JOIN promos p ON o.promos_id = p.promos_id`
+// 	if orderNumber != "" {
+// 		query += ` WHERE o.orders_id = $1`
+// 		switch sort {
+// 		case "asc":
+// 			query += ` ORDER BY o.orders_id ASC LIMIT $2 OFFSET $3`
+// 		case "desc":
+// 			query += ` ORDER BY o.orders_id DESC LIMIT $2 OFFSET $3`
+// 		default:
+// 			query += ` ORDER BY o.orders_id ASC LIMIT $2 OFFSET $3`
+// 		}
+// 		offset := newPage * newLimit - newLimit;
+// 		err := r.Select(&result, query, orderNumber, newLimit, strconv.Itoa(offset))
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		return result, nil
+// 	}
 
-	switch sort {
-	case "asc":
-		query += ` ORDER BY o.orders_id ASC LIMIT $1 OFFSET $2`
-	case "desc":
-		query += ` ORDER BY o.orders_id DESC LIMIT $1 OFFSET $2`
-	default:
-		query += ` ORDER BY o.orders_id ASC LIMIT $1 OFFSET $2`
-	}
-	offset := newPage * newLimit - newLimit;
-	err := r.Select(&result, query, newLimit, strconv.Itoa(offset))
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
-}
+// 	switch sort {
+// 	case "asc":
+// 		query += ` ORDER BY o.orders_id ASC LIMIT $1 OFFSET $2`
+// 	case "desc":
+// 		query += ` ORDER BY o.orders_id DESC LIMIT $1 OFFSET $2`
+// 	default:
+// 		query += ` ORDER BY o.orders_id ASC LIMIT $1 OFFSET $2`
+// 	}
+// 	offset := newPage * newLimit - newLimit;
+// 	err := r.Select(&result, query, newLimit, strconv.Itoa(offset))
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return result, nil
+// }
 
 func (r *OrdersRepository) RepositoryCountOrders(orderNumber string) ([]string, error) {
 	count := []string{}
@@ -146,7 +217,7 @@ func (r *OrdersRepository) RepositoryCountOrders(orderNumber string) ([]string, 
 		return count, nil
 }
 
-func (r *OrdersRepository) RepositoryUpdateOrders(body *models.OrdersModel, id string) (error) {
+func (r *OrdersRepository) RepositoryUpdateOrders(body *models.OrderUpdateModel, id string) (error) {
 	query := `UPDATE orders SET orders_status=:orders_status
 						WHERE orders_id =` + id
 	_, err := r.NamedExec(query, body)

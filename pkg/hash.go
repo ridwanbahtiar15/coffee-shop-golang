@@ -94,6 +94,7 @@ func (h *HashConfig) ComparePasswordAndHash(password string, hashedPassword stri
 func (h *HashConfig) decodeHash(hashedPassword string) (salt []byte, hash []byte, err error) {
 	// cek format hash
 	values := strings.Split(hashedPassword, "$")
+	fmt.Println(len(values))
 	if len(values) != 6 {
 		return nil, nil, errors.New("invalid hashed password format")
 	}

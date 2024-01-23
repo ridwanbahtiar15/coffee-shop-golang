@@ -8,10 +8,10 @@ import (
 )
 
 type IPromosRepository interface {
-	RepsitoryGetAllPromos(page string, limit string) ([]models.PromosModel, error)
+	RepositoryGetAllPromos(page string, limit string) ([]models.PromosModel, error)
 	RepositoryGetPromosById(id string) ([]models.PromosModel, error)
-	RepsitoryCreatePromos(body *models.PromosModel) (error)
-	RepsitoryUpdatePromos(body *models.UpdatePromosModel, id string) (error)
+	RepositoryCreatePromos(body *models.PromosModel) (error)
+	RepositoryUpdatePromos(body *models.UpdatePromosModel, id string) (error)
 	RepositoryDeletePromos(id string) (int64, error)
 	RepositoryCountPromos() ([]string, error)
 }
@@ -25,7 +25,7 @@ func InitializeRepoPromos(db *sqlx.DB) *PromosRepository {
 	return &dr
 }
 
-func (r *PromosRepository) RepsitoryGetAllPromos(page string, limit string) ([]models.PromosModel, error) {
+func (r *PromosRepository) RepositoryGetAllPromos(page string, limit string) ([]models.PromosModel, error) {
 	// result := []models.PromosModel{}
 	// query := `SELECT * FROM promos`
 	// err := r.Select(&result, query)
@@ -64,7 +64,7 @@ func (r *PromosRepository) RepositoryGetPromosById(id string) ([]models.PromosMo
 	return result, nil
 }
 
-func (r *PromosRepository) RepsitoryCreatePromos(body *models.PromosModel) (error) {
+func (r *PromosRepository) RepositoryCreatePromos(body *models.PromosModel) (error) {
 	query := `INSERT INTO promos (promos_name, promos_start, promos_end) values (:promos_name, :promos_start, :promos_end)`;
 	_, err := r.NamedExec(query, body)
 	if err != nil {
@@ -73,7 +73,7 @@ func (r *PromosRepository) RepsitoryCreatePromos(body *models.PromosModel) (erro
 	return nil
 }
 
-func (r *PromosRepository) RepsitoryUpdatePromos(body *models.UpdatePromosModel, id string) (error) {
+func (r *PromosRepository) RepositoryUpdatePromos(body *models.UpdatePromosModel, id string) (error) {
 	query := `UPDATE promos SET promos_name=:promos_name, promos_start=:promos_start, promos_end=:promos_end, updated_at = NOW() WHERE promos_id = ` + id;
 	_, err := r.NamedExec(query, body)
 	if err != nil {

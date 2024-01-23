@@ -30,3 +30,7 @@ type OrdersResponseModel struct {
 	Orders_status      				string     `db:"orders_status"`
 	Orders_total      				string     `db:"orders_total"`
 }
+
+type OrderUpdateModel struct {
+	Orders_status      				string     `db:"orders_status" form:"orders_status" json:"orders_status" valid:"required"`
+}

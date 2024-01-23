@@ -78,6 +78,7 @@ func (h *HandlerAuth) LoginUsers(ctx *gin.Context) {
 
 	hc := pkg.HashConfig{}
 	isValid, err := hc.ComparePasswordAndHash(body.Users_password, result[0].Users_password)
+	
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err.Error())
 		return

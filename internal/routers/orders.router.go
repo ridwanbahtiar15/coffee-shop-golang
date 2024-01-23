@@ -16,6 +16,7 @@ func RouterOrders(g *gin.Engine, db *sqlx.DB) {
 	repositoryAuth := repositories.InitializeRepoAuth(db)
 
 	route.GET("/", middlewares.JWTGate([]string{"1"}, repositoryAuth), handler.GetAllOrders)
+	route.GET("/:id", middlewares.JWTGate([]string{"1"}, repositoryAuth), handler.GetOrdersById)
 	route.POST("/", middlewares.JWTGate([]string{"1", "2"}, repositoryAuth), handler.CreateOrders)
 	route.PATCH("/:id", middlewares.JWTGate([]string{"1"}, repositoryAuth), handler.UpdateOrders)
 }

@@ -27,7 +27,7 @@ func (h *HandlerPromos) GetAllPromos(ctx *gin.Context) {
 	limit, _ := ctx.GetQuery("limit")
 
 	// if returnPage || returnLimit {
-		result, err := h.RepsitoryGetAllPromos(page, limit)
+		result, err := h.RepositoryGetAllPromos(page, limit)
 
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, err)
@@ -101,7 +101,7 @@ func (h *HandlerPromos) CreateProomos(ctx *gin.Context) {
 		return
 	}
 
-	err := h.RepsitoryCreatePromos(&body)
+	err := h.RepositoryCreatePromos(&body)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
@@ -139,7 +139,7 @@ func (h *HandlerPromos) UpdatePromos(ctx *gin.Context) {
 		body.Promos_end = result[0].Promos_end
 	}
 	
-	err := h.RepsitoryUpdatePromos(&body, id)
+	err := h.RepositoryUpdatePromos(&body, id)
 	fmt.Println(err)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
