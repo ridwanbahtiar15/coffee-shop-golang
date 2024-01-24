@@ -9,15 +9,15 @@ import (
 )
 
 type HandlerDeliveries struct {
-	*repositories.DeliveriesRepository
+	repositories.IDeliveriesRepository
 }
 
-func InitializeHandlerDeliveries(r *repositories.DeliveriesRepository) *HandlerDeliveries {
+func InitializeHandlerDeliveries(r repositories.IDeliveriesRepository) *HandlerDeliveries {
 	return &HandlerDeliveries{r}
 }
 
 func (h *HandlerDeliveries) GetAllDeliveries(ctx *gin.Context) {
-	result, err := h.RepsitoryGetAllDeliveries()
+	result, err := h.RepositoryGetAllDeliveries()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return

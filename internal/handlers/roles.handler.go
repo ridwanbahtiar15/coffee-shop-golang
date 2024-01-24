@@ -9,15 +9,15 @@ import (
 )
 
 type HandlerRoles struct {
-	*repositories.RolesRepository
+	repositories.IRoleRepository
 }
 
-func InitializeHandlerRoles(r *repositories.RolesRepository) *HandlerRoles {
+func InitializeHandlerRoles(r repositories.IRoleRepository) *HandlerRoles {
 	return &HandlerRoles{r}
 }
 
 func (h *HandlerRoles) GetAllRoles(ctx *gin.Context) {
-	result, err := h.RepsitoryGetAllRoles()
+	result, err := h.RepositoryGetAllRoles()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return

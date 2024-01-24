@@ -9,15 +9,15 @@ import (
 )
 
 type HandlerPaymentmethods struct {
-	*repositories.PaymentmethodsRepository
+	repositories.IPaymentMethodsRepository
 }
 
-func InitializeHandlerPaymentmethods(r *repositories.PaymentmethodsRepository) *HandlerPaymentmethods {
+func InitializeHandlerPaymentmethods(r repositories.IPaymentMethodsRepository) *HandlerPaymentmethods {
 	return &HandlerPaymentmethods{r}
 }
 
 func (h *HandlerPaymentmethods) GetAllPaymentmethods(ctx *gin.Context) {
-	result, err := h.RepsitoryGetAllPaymentmethods()
+	result, err := h.RepositoryGetAllPaymentmethods()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
@@ -28,5 +28,5 @@ func (h *HandlerPaymentmethods) GetAllPaymentmethods(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, helpers.GetResponse("get all payment method success", nil, nil))
+	ctx.JSON(http.StatusOK, helpers.GetResponse("get all payment method success", result, nil))
 }

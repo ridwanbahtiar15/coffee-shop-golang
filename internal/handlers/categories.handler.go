@@ -9,15 +9,15 @@ import (
 )
 
 type HandlerCategories struct {
-	*repositories.CategoriesRepository
+	repositories.ICategoriesRepository
 }
 
-func InitializeHandlerCategories(r *repositories.CategoriesRepository) *HandlerCategories {
+func InitializeHandlerCategories(r repositories.ICategoriesRepository) *HandlerCategories {
 	return &HandlerCategories{r}
 }
 
 func (h *HandlerCategories) GetAllCategories(ctx *gin.Context) {
-	result, err := h.RepsitoryGetAllCategories()
+	result, err := h.RepositoryGetAllCategories()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return

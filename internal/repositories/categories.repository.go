@@ -6,6 +6,10 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+type ICategoriesRepository interface {
+	RepositoryGetAllCategories() ([]models.CategoriesModel, error)
+}
+
 type CategoriesRepository struct {
 	*sqlx.DB
 }
@@ -20,7 +24,7 @@ func InitializeRepoCategories(db *sqlx.DB) *CategoriesRepository {
 // 	return &CategoriesRepository{db}
 // }
 
-func (r *CategoriesRepository) RepsitoryGetAllCategories() ([]models.CategoriesModel, error) {
+func (r *CategoriesRepository) RepositoryGetAllCategories() ([]models.CategoriesModel, error) {
 	result := []models.CategoriesModel{}
 	query := `SELECT * FROM categories`
 	err := r.Select(&result, query)

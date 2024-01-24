@@ -153,6 +153,7 @@ func (h *HandlerProducts) CreateProducts(ctx *gin.Context) {
 	}
 
 	id, err := h.RepositoryCreateProducts(&body)
+	fmt.Println(id)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
@@ -178,7 +179,7 @@ func (h *HandlerProducts) CreateProducts(ctx *gin.Context) {
 	}
 	defer file.Close()
 	
-	publicId := fmt.Sprintf("%s_%s-%s", "product", fieldName, strconv.Itoa(id[0]))
+	publicId := fmt.Sprintf("%s_%s-%s", "product", fieldName, strconv.Itoa(id))
 	folder := ""
 	res, errs := cld.Uploader(ctx, file, publicId, folder)
 
@@ -187,7 +188,7 @@ func (h *HandlerProducts) CreateProducts(ctx *gin.Context) {
 		return
 	}
 
-	errUpdate := h.RepositoryUpdateImgProducts(res.SecureURL, strconv.Itoa(id[0]))
+	errUpdate := h.RepositoryUpdateImgProducts(res.SecureURL, strconv.Itoa(id))
 	if errUpdate != nil {
 		ctx.JSON(http.StatusInternalServerError, helpers.GetResponse(errUpdate.Error(), nil, nil))
 		return

@@ -6,6 +6,10 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+type IDeliveriesRepository interface {
+	RepositoryGetAllDeliveries() ([]models.DeliveriesModel, error)
+}
+
 type DeliveriesRepository struct {
 	*sqlx.DB
 }
@@ -15,7 +19,7 @@ func InitializeRepoDeliveries(db *sqlx.DB) *DeliveriesRepository {
 	return &dr
 }
 
-func (r *DeliveriesRepository) RepsitoryGetAllDeliveries() ([]models.DeliveriesModel, error) {
+func (r *DeliveriesRepository) RepositoryGetAllDeliveries() ([]models.DeliveriesModel, error) {
 	result := []models.DeliveriesModel{}
 	query := `SELECT * FROM deliveries`
 	err := r.Select(&result, query)

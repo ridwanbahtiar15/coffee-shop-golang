@@ -13,7 +13,7 @@ type IProductsRepository interface {
 	RepositoryCountProducts(name string, category string, minrange string, maxrange string) ([]string, error)
 	RepositoryGetAllProducts(name string, category string, minrange string, maxrange string, page string, limit string, sort string) ([]models.ProductsResponseModel, error)
 	RepositoryProductsById(id string) ([]models.ProductsResponseModel, error)
-	RepositoryCreateProducts(body *models.ProductsModel) ([]int, error)
+	RepositoryCreateProducts(body *models.ProductsModel) (int, error)
 	RepositoryUpdateProducts(body *models.UpdateProductsModel, id string) (error)
 	RepositoryUpdateImgProducts(productImg string, id string) (error)
 	RepositoryDeleteProducts(id string) (int64, error)
@@ -159,8 +159,8 @@ func (r *ProductsRepository) RepositoryProductsById(id string) ([]models.Product
 	return result, nil
 }
 
-func (r *ProductsRepository) RepositoryCreateProducts(body *models.ProductsModel) ([]int, error) {
-	var id = []int{}
+func (r *ProductsRepository) RepositoryCreateProducts(body *models.ProductsModel) (int, error) {
+	var id int
 	query := `INSERT INTO products 
 						(products_name, products_price, products_desc, products_stock, categories_id) 
 						VALUES 
@@ -168,7 +168,7 @@ func (r *ProductsRepository) RepositoryCreateProducts(body *models.ProductsModel
 						RETURNING products_id`
 	result, err := r.NamedQuery(query, body)
 	if err != nil {
-		return []int{0}, err 
+		return 0, err 
 	}
 	if result.Next() {
     result.Scan(&id)

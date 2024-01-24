@@ -6,6 +6,10 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+type IPaymentMethodsRepository interface {
+	RepositoryGetAllPaymentmethods() ([]models.PaymentmethodsModel, error)
+}
+
 type PaymentmethodsRepository struct {
 	*sqlx.DB
 }
@@ -15,39 +19,12 @@ func InitializeRepoPaymentmethods(db *sqlx.DB) *PaymentmethodsRepository {
 	return &dr
 }
 
-func (r *PaymentmethodsRepository) RepsitoryGetAllPaymentmethods() ([]models.PaymentmethodsModel, error) {
+func (r *PaymentmethodsRepository) RepositoryGetAllPaymentmethods() ([]models.PaymentmethodsModel, error) {
 	result := []models.PaymentmethodsModel{}
-	query := `SELECT * FROM payment_methods`
+	query := `SELECT payment_methods_id, payment_methods_name FROM payment_methods`
 	err := r.Select(&result, query)
 	if err != nil {
 		return nil, err
 	}
 	return result, nil
 }
-
-// func (r *DeliveriesRepository) RepsitoryCreateDeliveries(body *models.DeliveriesModel) (sql.Result, error) {
-// 	query := `INSERT INTO deliveries (deliveries_name, deliveries_cost) VALUES (:deliveries_name, :deliveries_cost)`
-// 	result, err := r.NamedExec(query, body)
-// 	if err != nil {
-// 		return result, err 
-// 	}
-// 	return result, nil
-// }
-
-// func (r *DeliveriesRepository) RepsitoryUpdateDeliveries(body *models.DeliveriesModel, id string) (sql.Result, error) {
-// 	query := `UPDATE deliveries SET deliveries_name=:deliveries_name, deliveries_cost=:deliveries_cost WHERE deliveries_id =` + id
-// 	result, err := r.NamedExec(query, body)
-// 	if err != nil {
-// 		return result, err 
-// 	}
-// 	return result, nil
-// }
-
-// func (r *DeliveriesRepository) RepositoryDeleteDeliveries(id string) (sql.Result, error) {
-// 	query := `DELETE FROM deliveries WHERE deliveries_id = $1`
-// 	result, err := r.Exec(query, id)
-// 	if err != nil {
-// 		return result, err 
-// 	}
-// 	return result, nil
-// }

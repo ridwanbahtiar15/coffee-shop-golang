@@ -21,9 +21,9 @@ func (prm *ProductRepositoryMock) RepositoryCountProducts(name string, category 
 	return args.Get(0).([]string), args.Error(1)
 }
 
-func (arm *ProductRepositoryMock) RepositoryCreateProducts(body *models.ProductsModel) ([]int, error) {
+func (arm *ProductRepositoryMock) RepositoryCreateProducts(body *models.ProductsModel) (int, error) {
 	args := arm.Mock.Called(body)
-	return args.Get(0).([]int), args.Error(1)
+	return args.Get(0).(int), args.Error(1)
 }
 
 // RepositoryDeleteProducts implements IProductsRepository.
