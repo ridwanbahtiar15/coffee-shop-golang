@@ -34,21 +34,21 @@ according to your needs. You will need:
 
 ## Install And Run Locally
 
-1. Clone project from github repository
+1.  Clone project from github repository
 
-   $ git clone https://github.com/ridwanbahtiar15/coffee-shop-golang.git
+        $ git clone https://github.com/ridwanbahtiar15/coffee-shop-golang.git
 
-2. go to folder coffee-shop
+2.  go to folder coffee-shop
 
-   $ cd coffee-shop-golang
+        $ cd coffee-shop-golang
 
-3. install dependencies
+3.  install dependencies
 
-   $ go get -d ./...
+        $ go get -d ./...
 
-4. Start the server
+4.  Start the server
 
-   $ go run ./cmd/main.go
+        $ go run ./cmd/main.go
 
 ## Api Refrences
 
