@@ -92,8 +92,8 @@ func TestUserById(t *testing.T) {
 	})
 
 	t.Run("Get not found user by id", func(t *testing.T){
-		var urm = repositories.UsersRepositoryMock{}
-		res := httptest.NewRecorder()
+		urm = repositories.UsersRepositoryMock{}
+		res = httptest.NewRecorder()
 		ex := []models.UsersResponseModel{}
 		urm.On("RepositoryUsersById", mock.AnythingOfType("string")).Return(ex, nil)
 

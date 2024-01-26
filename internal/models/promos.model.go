@@ -7,8 +7,8 @@ type PromosModel struct {
 	Promos_name      string     `db:"promos_name" form:"promos_name" json:"promos_name" valid:"required"`
 	Promos_start      string     `db:"promos_start" form:"promos_start" json:"promos_start" valid:"required"`
 	Promos_end      string     `db:"promos_end" form:"promos_end" json:"promos_end" valid:"required"`
-	Created_at *time.Time `db:"created_at" valid:"-"`
-	Updated_at *time.Time `db:"updated_at" valid:"-"`
+	Created_at *time.Time `db:"created_at" valid:"-" json:"created_at,omitempty"`
+	Updated_at *time.Time `db:"updated_at" valid:"-" json:"updated_at,omitempty"`
 }
 
 type UpdatePromosModel struct {

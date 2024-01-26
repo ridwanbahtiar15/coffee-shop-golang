@@ -8,34 +8,11 @@ A web api project for ordering coffee and transactions online. There are 4 opera
 
 ## Built With
 
-- [![Golang][Golang-logo]][Golang-url]
-- [![PostgreSql][PostgreSql-logo]][PostgreSql-url]
-
-### Package
-
-- [![GinGonic][GinGonic-logo]][GinGonic-url]
-- [![GoValidator][GoValidator-logo]][GoValidator-url]
-- [![Cloudinary][Cloudinary-logo]][Cloudinary-url]
-- [![Pq][Pq-logo]][Pq-url]
-- [![DotEnv][DotEnv-logo]][DotEnv-url]
-
-## Install And Run Locally
-
-Clone project from github repository
-
-    $ git clone https://github.com/ridwanbahtiar15/coffee-shop-golang.git
-
-go to folder coffee-shop
-
-    $ cd coffee-shop-golang
-
-install dependencies
-
-    $ go get -d ./...
-
-Start the server
-
-    $ go run ./cmd/main.go
+- [Golang](https://go.dev/)
+- [Postgre SQL](https://www.postgresql.org/)
+- [GinGonic](https://gin-gonic.com/)
+- [GoValidator](https://github.com/asaskevich/govalidator)
+- [Cloudinary](https://github.com/cloudinary/cloudinary-go)
 
 ## Configure app
 
@@ -54,6 +31,24 @@ according to your needs. You will need:
 | CLOUDINERY_NAME   | Your Cloudinary Name   |
 | CLOUDINERY_KEY    | Your Cloudinary Key    |
 | CLOUDINERY_SECRET | Your Cloudinary Secret |
+
+## Install And Run Locally
+
+1. Clone project from github repository
+
+   $ git clone https://github.com/ridwanbahtiar15/coffee-shop-golang.git
+
+2. go to folder coffee-shop
+
+   $ cd coffee-shop-golang
+
+3. install dependencies
+
+   $ go get -d ./...
+
+4. Start the server
+
+   $ go run ./cmd/main.go
 
 ## Api Refrences
 
@@ -100,25 +95,5 @@ User
 ## Related Project
 
 [Front End With React JS](https://github.com/ridwanbahtiar15/coffee-shop-react-vite.git)
+
 [Back End With Express JS](https://github.com/ridwanbahtiar15/coffe-shop.git)
-
-## Credit
-
-[Ridwan Bahtiar](https://github.com/ridwanbahtiar15)
-
-<!-- MARKDOWN LINKS & IMAGES -->
-
-[Golang-url]: https://go.dev/
-[Golang-logo]: https://img.shields.io/badge/Golang-blue
-[Gingonic-url]: https://gin-gonic.com/
-[Gingonic-logo]: https://img.shields.io/badge/Gin%20Gonic-lightskyblue
-[PostgreSql-url]: https://www.postgresql.org/
-[PostgreSql-logo]: https://img.shields.io/badge/Postgre%20SQL-blue
-[GoValidator-url]: https://github.com/asaskevich/govalidator
-[GoValidator-logo]: https://img.shields.io/badge/Go%20Validator-red
-[Cloudinary-url]: https://github.com/cloudinary/cloudinary-go
-[Cloudinary-logo]: https://img.shields.io/badge/Cloudinay-green
-[Pq-url]: https://github.com/lib/pq
-[Pq-logo]: https://img.shields.io/badge/pq-grey
-[DotEnv-url]: https://github.com/joho/godotenv
-[DotEnv-logo]: https://img.shields.io/badge/godotenv-black

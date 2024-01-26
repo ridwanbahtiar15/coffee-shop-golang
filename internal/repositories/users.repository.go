@@ -80,7 +80,7 @@ func (r *UsersRepository) RepositoryGetAllUsers(name string, page string, limit 
 
 func (r *UsersRepository) RepositoryUsersById(id string) ([]models.UsersResponseModel, error) {
 	result := []models.UsersResponseModel{}
-	query := `SELECT u.users_fullname, u.users_email, u.users_password, u.users_phone, 
+	query := `SELECT u.users_fullname, u.users_email, u.users_phone, 
 						u.users_address, u.users_image, r.roles_name 
 						FROM users u
 						JOIN roles r on u.roles_id = r.roles_id

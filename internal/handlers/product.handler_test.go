@@ -29,7 +29,6 @@ func TestGetAllProduct(t *testing.T) {
 		ex := make([]models.ProductsResponseModel, 2)
 		meta := &helpers.Meta{
 			Page:     1,
-			TotalData: 2,
 			NextPage: "null",
 			PrevPage: "null",
 		}

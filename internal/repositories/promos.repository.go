@@ -45,7 +45,7 @@ func (r *PromosRepository) RepositoryGetAllPromos(page string, limit string) ([]
 	}
 
 	result := []models.PromosModel{}
-	query := `SELECT * FROM promos WHERE promos_id != '0' LIMIT $1 OFFSET $2`
+	query := `SELECT promos_id, promos_name, promos_start, promos_end FROM promos WHERE promos_id != '0' LIMIT $1 OFFSET $2`
 	offset := newPage * newLimit - newLimit;
 		err := r.Select(&result, query, newLimit, strconv.Itoa(offset))
 		if err != nil {
