@@ -2,7 +2,7 @@
 
 <!-- ABOUT THE PROJECT -->
 
-<img src="./coffee-shop-logo.webp" width="300px" alt="logo" style="display: inline-block; margin: 0 auto;"></img>
+<img src="./coffee-shop-logo.webp" width="200px" alt="logo" style="display: inline-block; align: center;"></img>
 
 A web api project for ordering coffee and transactions online. There are 4 operations that can be performed, Get (fetching data), Post (insert data), Update (update partial data), delete (delete data)
 
