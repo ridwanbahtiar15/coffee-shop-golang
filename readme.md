@@ -1,8 +1,10 @@
-# Coffe Shop With Golang
+# Coffee Shop With Golang
 
 <!-- ABOUT THE PROJECT -->
 
-<img src="./coffee-shop-logo.webp" width="200px" alt="logo"></img>
+<div align="center">
+        <img src="./coffee-shop-logo.webp" width="200px" alt="logo"></img>
+</div>
 
 A web api project for ordering coffee and transactions online. There are 4 operations that can be performed, Get (fetching data), Post (insert data), Update (update partial data), delete (delete data)
 
@@ -19,18 +21,20 @@ A web api project for ordering coffee and transactions online. There are 4 opera
 Create file `.env` then edit it with your settings
 according to your needs. You will need:
 
-| Key               | Value                  |
-| ----------------- | ---------------------- |
-| DB_HOST           | Your Database Host     |
-| DB_NAME           | Your Database Host     |
-| DB_USER           | Your Database User     |
-| DB_PASSWORD       | Your Database Password |
-| DB_SSLMODE        | disable                |
-| JWT_SECRET        | Your JWT Secret        |
-| JWT_ISSUER        | Your Issuer            |
-| CLOUDINERY_NAME   | Your Cloudinary Name   |
-| CLOUDINERY_KEY    | Your Cloudinary Key    |
-| CLOUDINERY_SECRET | Your Cloudinary Secret |
+<pre>
+<code>
+DB_HOST = Your Database Host
+DB_NAME = Your Database Host
+DB_USER = Your Database User
+DB_SSLMODE = disable
+DB_PASSWORD = Your Database Password
+JWT_KEY = Your JWT Key
+JWT_ISSUER = Your Issuer
+CLOUDINERY_NAME = Your Cloudinary Name
+CLOUDINERY_KEY = Your Cloudinary Key
+CLOUDINERY_SECRET = Your Cloudinary Secret
+</code>
+</pre>
 
 ## Install And Run Locally
 
@@ -90,10 +94,9 @@ User
 
 ## Documentation
 
-[Postman Documentation](https://documenter.getpostman.com/view/28541505/2s9YsT4npX)
+[Postman Documentation](https://documenter.getpostman.com/view/28541505/2s9Yyqhgjq)
 
 ## Related Project
 
-[Front End With React JS](https://github.com/ridwanbahtiar15/coffee-shop-react-vite.git)
-
-[Back End With Express JS](https://github.com/ridwanbahtiar15/coffe-shop.git)
+- [Front End With React JS](https://github.com/ridwanbahtiar15/coffee-shop-react-vite.git)
+- [Back End With Express JS](https://github.com/ridwanbahtiar15/coffe-shop.git)
