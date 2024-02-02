@@ -48,7 +48,7 @@ CLOUDINERY_SECRET = Your Cloudinary Secret
 
 3.  install dependencies
 
-        $ go get -d ./...
+        $ go get .
 
 4.  Start the server
 
