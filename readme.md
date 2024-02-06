@@ -30,9 +30,9 @@ DB_SSLMODE = disable
 DB_PASSWORD = Your Database Password
 JWT_KEY = Your JWT Key
 JWT_ISSUER = Your Issuer
-CLOUDINERY_NAME = Your Cloudinary Name
-CLOUDINERY_KEY = Your Cloudinary Key
-CLOUDINERY_SECRET = Your Cloudinary Secret
+CLOUDINARY_NAME = Your Cloudinary Name
+CLOUDINARY_KEY = Your Cloudinary Key
+CLOUDINARY_SECRET = Your Cloudinary Secret
 </code>
 </pre>
 
